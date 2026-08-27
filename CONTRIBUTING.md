@@ -21,6 +21,31 @@ trip.
 Optional: `tags` (an array of lowercase words), `homepage`, `minimumGailanVersion`,
 `screenshot` (defaults to `preview.png`).
 
+## Settings a widget offers
+
+A widget can declare settings, which Gailan turns into controls in its Widgets
+window and hands to `render` as `props.settings`:
+
+```json
+{
+  "settings": [
+    {
+      "key": "size",
+      "type": "choice",
+      "label": "Size",
+      "default": "medium",
+      "options": ["small", "medium", "large"]
+    },
+    {"key": "showSeconds", "type": "toggle", "label": "Show seconds", "default": true}
+  ]
+}
+```
+
+`choice`, `toggle`, `number` (with `min`, `max`, `step`), `text` and `color`. Give
+every setting a `default`, since that is what the control shows before anyone has
+touched it. What the user picks is saved as `settings.json` in the widget's folder,
+so add that file to your `.gitignore` rather than committing your own choices.
+
 ## What review looks at
 
 - **It compiles.** CI runs esbuild over the entry file, the same bundler Gailan

@@ -27,11 +27,15 @@ Gailan watches the folder, so a widget appears as soon as it is copied in. Open
 
 ```
 widgets/clock/
-  widget.json      the manifest CI reads
+  widget.json      the manifest CI reads, and any settings the widget offers
   index.tsx        the widget itself
   README.md        what it does, and anything it needs
   preview.png      a screenshot, 2x, cropped to the widget
 ```
+
+The folder name is the widget's id, so `widgets/clock/index.tsx` appears in Gailan
+as `clock`. Gailan writes a `settings.json` beside the widget for whatever the user
+chooses, which is why it is in `.gitignore`.
 
 `widget.json` looks like this:
 
