@@ -98,7 +98,9 @@ as you like.
   to split.
 - Editing someone else's widget is welcome, but say why in the description, and
   expect the original author to be asked.
-- Bumping `version` is only needed when behavior changes, not for a typo.
+- Bump `version` in every pull request that changes a widget's files. Gailan
+  compares the installed version against this index to decide what to offer as an
+  update, so a change that ships without a bump never reaches anyone.
 - Screenshots go in the folder as `preview.png`, not pasted into the description.
   Crop to the widget, take it at 2x, and keep it under 500KB.
 

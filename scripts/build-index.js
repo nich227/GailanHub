@@ -21,6 +21,24 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const widgetsDir = path.join(root, 'widgets');
 
+// Everything a widget is made of, so anything installing one can fetch it file by
+// file. GitHub serves whole repositories as archives but never a single folder, and
+// walking the tree over the API costs a request and counts against a rate limit.
+// A user's own settings.json is not part of the widget.
+function filesIn(dir, prefix = '') {
+  return fs
+    .readdirSync(dir, {withFileTypes: true})
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .flatMap((entry) => {
+      const name = prefix + entry.name;
+      if (entry.isDirectory()) {
+        return filesIn(path.join(dir, entry.name), `${name}/`);
+      }
+      if (name === 'settings.json') return [];
+      return [{path: name, bytes: fs.statSync(path.join(dir, entry.name)).size}];
+    });
+}
+
 const widgets = fs
   .readdirSync(widgetsDir, {withFileTypes: true})
   .filter((entry) => entry.isDirectory())
@@ -41,6 +59,8 @@ const widgets = fs
       homepage: manifest.homepage || null,
       path: `widgets/${name}`,
       screenshot: `widgets/${name}/${manifest.screenshot || 'preview.png'}`,
+      entry: manifest.entry,
+      files: filesIn(path.join(widgetsDir, name)),
     };
   });
 
