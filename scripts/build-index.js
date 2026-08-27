@@ -44,6 +44,8 @@ const widgets = fs
     };
   });
 
-const index = {generated: new Date().toISOString(), count: widgets.length, widgets};
+// No timestamp: the file has to be reproducible or CI can never tell whether it
+// is stale. Git already records when it changed.
+const index = {count: widgets.length, widgets};
 fs.writeFileSync(path.join(root, 'index.json'), JSON.stringify(index, null, 2) + '\n');
 console.log(`index.json written with ${widgets.length} widget(s)`);
