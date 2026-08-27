@@ -1,0 +1,20 @@
+{
+  "generated": "2026-08-27T20:20:57.594Z",
+  "count": 1,
+  "widgets": [
+    {
+      "name": "clock",
+      "title": "Clock",
+      "description": "The time, the date, and how far through the year you are",
+      "author": "Kevin Chen",
+      "license": "MIT",
+      "version": "1.0.0",
+      "tags": [
+        "time"
+      ],
+      "homepage": null,
+      "path": "widgets/clock",
+      "screenshot": "widgets/clock/preview.png"
+    }
+  ]
+}

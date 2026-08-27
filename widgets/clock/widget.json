@@ -1,0 +1,11 @@
+{
+  "name": "clock",
+  "title": "Clock",
+  "description": "The time, the date, and how far through the year you are",
+  "author": "Kevin Chen",
+  "license": "MIT",
+  "version": "1.0.0",
+  "entry": "index.tsx",
+  "tags": ["time"],
+  "minimumGailanVersion": "1.0.0"
+}

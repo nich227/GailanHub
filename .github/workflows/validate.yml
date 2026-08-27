@@ -1,0 +1,26 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  widgets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: npm install --no-audit --no-fund
+      - run: npm run validate
+      # the index the website reads has to match what is in the repository
+      - run: npm run index
+      - name: index.json is up to date
+        run: |
+          if ! git diff --quiet -- index.json; then
+            echo "index.json is stale. run npm run index and commit it." >&2
+            git --no-pager diff -- index.json >&2
+            exit 1
+          fi

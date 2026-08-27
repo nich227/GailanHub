@@ -1,0 +1,13 @@
+{
+  "name": "gailanhub",
+  "private": true,
+  "description": "Widgets for Gailan",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "validate": "node scripts/validate.js",
+    "index": "node scripts/build-index.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
+}
