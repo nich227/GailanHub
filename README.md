@@ -71,5 +71,5 @@ compile does not land.
 [CONTRIBUTING.md](CONTRIBUTING.md) has the details, including what review looks
 at and why a widget might be sent back.
 
-Widgets keep whatever licence their author chooses, declared in the manifest. The
+Widgets keep whatever license their author chooses, declared in the manifest. The
 repository itself is GPL-3.0, matching Gailan.

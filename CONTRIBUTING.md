@@ -73,7 +73,7 @@ as you like.
   to split.
 - Editing someone else's widget is welcome, but say why in the description, and
   expect the original author to be asked.
-- Bumping `version` is only needed when behaviour changes, not for a typo.
+- Bumping `version` is only needed when behavior changes, not for a typo.
 - Screenshots go in the folder as `preview.png`, not pasted into the description.
   Crop to the widget, take it at 2x, and keep it under 500KB.
 

@@ -1,21 +1,20 @@
 /*
  * Clock
  *
- * The template every other widget in this repository started from: one shell
- * command, one styled component, one render.
+ * Minimalist: monochrome with one red, monospace at every size, hairlines
+ * instead of shadows, and labels that read like markings on a case rather than
+ * words on a page.
  *
  * Copyright (c) 2026 Kevin Chen. MIT licensed.
  */
 
 import { styled } from "gailan";
 
-/* `date` is in every shell, so this needs nothing installed. The separator makes
-   one command return three fields without three commands. */
-export const command = "date '+%H:%M|%a %d %b|%j'";
+/* One command, three fields. The separator saves running `date` three times. */
+export const command = "date '+%H:%M|%S|%a %d %b|%j'";
 
-/* A clock only has to be right to the minute, so once a second is waste. Ten
-   seconds is close enough that it never looks stale. */
-export const refreshFrequency = 10000;
+/* Seconds are shown, so this has to tick like one. */
+export const refreshFrequency = 1000;
 
 export const className = `
   left: 24px;
@@ -23,37 +22,89 @@ export const className = `
 `;
 
 const Panel = styled("div")`
-  --ink: #f2f2f4;
-  --dim: rgba(242, 242, 244, 0.55);
+  --ink: #f4f4f2;
+  --dim: rgba(244, 244, 242, 0.42);
+  --rule: rgba(244, 244, 242, 0.16);
+  --red: #d71921;
 
   @media (prefers-color-scheme: light) {
-    --ink: #16161a;
-    --dim: rgba(22, 22, 26, 0.55);
+    --ink: #0b0b0c;
+    --dim: rgba(11, 11, 12, 0.45);
+    --rule: rgba(11, 11, 12, 0.18);
   }
 
-  display: inline-flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 14px 18px;
-  border-radius: 12px;
-  background: rgba(20, 20, 26, 0.42);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  position: relative;
+  display: inline-block;
+  min-width: 208px;
+  padding: 14px 16px 12px;
+  /* flat, not glassy: the surface does not pretend to be lit */
+  background: rgba(11, 11, 12, 0.82);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
   color: var(--ink);
   font-family: "SF Mono", ui-monospace, Menlo, monospace;
+
+  @media (prefers-color-scheme: light) {
+    background: rgba(244, 244, 242, 0.86);
+  }
+`;
+
+/* The row of markings across the top, which is what makes the panel read as an
+   instrument before you have read a single word. */
+const Marks = styled("div")`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+`;
+
+const Mark = styled("div")`
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+`;
+
+const Dot = styled("div")`
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+`;
+
+const Readout = styled("div")`
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 `;
 
 const Time = styled("div")`
-  font-size: 34px;
-  line-height: 1;
-  letter-spacing: -0.5px;
-  /* digits keep their column, so the width does not jitter every minute */
+  font-size: 40px;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  /* digits keep their column so the panel never twitches */
   font-variant-numeric: tabular-nums;
 `;
 
-const Line = styled("div")`
-  font-size: 11px;
-  letter-spacing: 1.4px;
+const Seconds = styled("div")`
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--red);
+  font-variant-numeric: tabular-nums;
+`;
+
+const Footer = styled("div")`
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  font-size: 9px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--dim);
 `;
@@ -61,15 +112,39 @@ const Line = styled("div")`
 type State = { output: string; error?: string };
 
 export const render = ({ output, error }: State) => {
-  if (error) return <Panel><Line>clock unavailable</Line></Panel>;
+  if (error) {
+    return (
+      <Panel>
+        <Marks>
+          <Mark>clock</Mark>
+          <Dot />
+        </Marks>
+        <Mark>unavailable</Mark>
+      </Panel>
+    );
+  }
 
-  const [time, date, dayOfYear] = output.trim().split("|");
+  const [time, seconds, date, dayOfYear] = output.trim().split("|");
+  const day = Number(dayOfYear);
 
   return (
-    <Panel>
-      <Time>{time}</Time>
-      <Line>{date}</Line>
-      <Line>day {Number(dayOfYear)} of 365</Line>
+    <Panel data-gailan-desktop-glass={4}>
+      <Marks>
+        <Mark>local time</Mark>
+        <Dot />
+      </Marks>
+
+      <Readout>
+        <Time>{time}</Time>
+        <Seconds>{seconds}</Seconds>
+      </Readout>
+
+      <Footer>
+        <span>{date}</span>
+        <span>
+          {String(day).padStart(3, "0")}/365
+        </span>
+      </Footer>
     </Panel>
   );
 };

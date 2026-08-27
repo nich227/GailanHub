@@ -15,6 +15,6 @@ Move it by editing `className` in `index.tsx`. `refreshFrequency` is ten seconds
 which is enough for a clock that only shows minutes; lower it and you are asking
 your Mac to redraw for nothing.
 
-## Licence
+## License
 
 MIT, © 2026 Kevin Chen.
