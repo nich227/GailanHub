@@ -21,12 +21,8 @@
           "bytes": 4492
         },
         {
-          "path": "dotmatrix.ttf",
-          "bytes": 2456
-        },
-        {
           "path": "index.tsx",
-          "bytes": 6675
+          "bytes": 10264
         },
         {
           "path": "preview.jpg",
@@ -34,7 +30,7 @@
         },
         {
           "path": "README.md",
-          "bytes": 866
+          "bytes": 1018
         },
         {
           "path": "widget.json",

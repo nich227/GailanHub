@@ -14,6 +14,7 @@ Two faces, chosen in the widget's settings:
 Both tick every second, because both show seconds.
 
 The dot matrix numerals are [DotGothic16](https://github.com/fontworks-fonts/DotGothic16)
-under the SIL Open Font License, which is in `dotmatrix-OFL.txt`. The file beside this
-one holds only the digits and the colon, so it costs 2KB rather than the 2MB of the full
-face.
+under the SIL Open Font License, which is in `dotmatrix-OFL.txt`. Only the ten digits and
+the colon are included, 2KB against the 2MB of the full face, and they are carried inside
+`index.tsx` rather than sitting beside it: Gailan serves a widget's files under its folder
+name, so a path would break the moment you renamed the folder.
