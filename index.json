@@ -1,5 +1,5 @@
 {
-  "count": 1,
+  "count": 3,
   "widgets": [
     {
       "name": "clock",
@@ -22,7 +22,7 @@
         },
         {
           "path": "preview.jpg",
-          "bytes": 133115
+          "bytes": 131069
         },
         {
           "path": "README.md",
@@ -31,6 +31,72 @@
         {
           "path": "widget.json",
           "bytes": 266
+        }
+      ]
+    },
+    {
+      "name": "memory",
+      "title": "Memory",
+      "description": "How much of your memory is in use, on a scale you can read a value off",
+      "author": "Kevin Chen",
+      "license": "MIT",
+      "version": "1.0.0",
+      "tags": [
+        "system"
+      ],
+      "homepage": null,
+      "path": "widgets/memory",
+      "screenshot": "widgets/memory/preview.jpg",
+      "entry": "index.tsx",
+      "files": [
+        {
+          "path": "index.tsx",
+          "bytes": 4039
+        },
+        {
+          "path": "preview.jpg",
+          "bytes": 123805
+        },
+        {
+          "path": "README.md",
+          "bytes": 425
+        },
+        {
+          "path": "widget.json",
+          "bytes": 284
+        }
+      ]
+    },
+    {
+      "name": "nowplaying",
+      "title": "Now Playing",
+      "description": "What Spotify or Music is playing, and nothing when neither is",
+      "author": "Kevin Chen",
+      "license": "MIT",
+      "version": "1.0.0",
+      "tags": [
+        "music"
+      ],
+      "homepage": null,
+      "path": "widgets/nowplaying",
+      "screenshot": "widgets/nowplaying/preview.jpg",
+      "entry": "index.tsx",
+      "files": [
+        {
+          "path": "index.tsx",
+          "bytes": 3700
+        },
+        {
+          "path": "preview.jpg",
+          "bytes": 129134
+        },
+        {
+          "path": "README.md",
+          "bytes": 449
+        },
+        {
+          "path": "widget.json",
+          "bytes": 283
         }
       ]
     }

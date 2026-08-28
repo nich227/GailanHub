@@ -1,0 +1,11 @@
+{
+  "name": "memory",
+  "title": "Memory",
+  "description": "How much of your memory is in use, on a scale you can read a value off",
+  "author": "Kevin Chen",
+  "license": "MIT",
+  "version": "1.0.0",
+  "entry": "index.tsx",
+  "tags": ["system"],
+  "minimumGailanVersion": "1.0.0"
+}

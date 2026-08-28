@@ -1,0 +1,11 @@
+{
+  "name": "nowplaying",
+  "title": "Now Playing",
+  "description": "What Spotify or Music is playing, and nothing when neither is",
+  "author": "Kevin Chen",
+  "license": "MIT",
+  "version": "1.0.0",
+  "entry": "index.tsx",
+  "tags": ["music"],
+  "minimumGailanVersion": "1.0.0"
+}

@@ -1,0 +1,153 @@
+/*
+ * Now Playing
+ *
+ * What Spotify or Music is playing, if either is. Same language as the clock:
+ * monochrome with one red, monospace at every size, hairlines instead of shadows.
+ *
+ * The first time this runs, macOS asks whether Gailan may control Spotify and
+ * Music. Say yes or the widget has nothing to read. System Settings, Privacy &
+ * Security, Automation, if you say no and change your mind.
+ *
+ * Copyright (c) 2026 Kevin Chen. MIT licensed.
+ */
+
+import { styled } from "gailan";
+
+/* Spotify first, then Music, and nothing at all if neither is playing. Each -e is
+   a line of AppleScript, which keeps this to one command. */
+export const command = [
+  "osascript",
+  '-e \'set a to ""\'',
+  "-e 'tell application \"System Events\" to set p to name of processes'",
+  "-e 'if p contains \"Spotify\" then tell application \"Spotify\" to" +
+    " if player state is playing then set a to (name of current track)" +
+    ' & "|" & (artist of current track)\'',
+  "-e 'if a is \"\" and p contains \"Music\" then tell application \"Music\" to" +
+    " if player state is playing then set a to (name of current track)" +
+    ' & "|" & (artist of current track)\'',
+  "-e 'return a'",
+].join(" ");
+
+/* A track lasts minutes, and asking a player what it is playing is not free. */
+export const refreshFrequency = 5000;
+
+export const className = `
+  left: 24px;
+  top: 376px;
+`;
+
+const Panel = styled("div")`
+  --ink: #f4f4f2;
+  --dim: rgba(244, 244, 242, 0.42);
+  --rule: rgba(244, 244, 242, 0.16);
+  --red: #d71921;
+
+  @media (prefers-color-scheme: light) {
+    --ink: #0b0b0c;
+    --dim: rgba(11, 11, 12, 0.45);
+    --rule: rgba(11, 11, 12, 0.18);
+  }
+
+  position: relative;
+  display: inline-block;
+  width: 208px;
+  padding: 14px 16px 12px;
+  background: rgba(11, 11, 12, 0.82);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: "SF Mono", ui-monospace, Menlo, monospace;
+
+  @media (prefers-color-scheme: light) {
+    background: rgba(244, 244, 242, 0.86);
+  }
+`;
+
+const Marks = styled("div")`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+`;
+
+const Mark = styled("div")`
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+`;
+
+const Dot = styled("div")`
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+`;
+
+const Title = styled("div")`
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 500;
+  /* a long title wraps to two lines and then stops, so the panel keeps its shape */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
+
+const Artist = styled("div")`
+  margin-top: 5px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const Silent = styled("div")`
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+`;
+
+type State = { output: string; error?: string };
+
+export const render = ({ output, error }: State) => {
+  if (error) {
+    return (
+      <Panel>
+        <Marks>
+          <Mark>now playing</Mark>
+        </Marks>
+        <Mark>{error}</Mark>
+      </Panel>
+    );
+  }
+
+  const [title, artist] = output.trim().split("|");
+
+  if (!title) {
+    return (
+      <Panel>
+        <Marks>
+          <Mark>now playing</Mark>
+        </Marks>
+        <Silent>nothing</Silent>
+      </Panel>
+    );
+  }
+
+  return (
+    <Panel>
+      <Marks>
+        <Mark>now playing</Mark>
+        <Dot />
+      </Marks>
+      <Title>{title}</Title>
+      <Artist>{artist || "unknown"}</Artist>
+    </Panel>
+  );
+};

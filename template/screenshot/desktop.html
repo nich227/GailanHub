@@ -147,19 +147,23 @@
         background: rgba(255, 255, 255, 0.4);
       }
 
-      /* the widget sits where a widget sits: on the desktop, under the bar */
-      #gailan {
+      /* a widget sits where a widget sits: on the desktop, under the bar. The slot
+         takes the widget's size rather than the width of the screen, so placement
+         and scaling both have something real to work from. */
+      .slot {
         position: absolute;
         top: 60px;
         right: 70px;
+        width: fit-content;
+        height: fit-content;
       }
 
-      #gailan.left {
+      .slot.left {
         right: auto;
         left: 70px;
       }
 
-      #gailan.centre {
+      .slot.centre {
         right: auto;
         left: 50%;
         transform: translateX(-50%);
@@ -210,7 +214,7 @@
         </div>
       </div>
 
-      <div id="gailan"></div>
+      <!-- widgets are added here, one slot each -->
 
       <div id="dock">
         <div class="app-icon" style="background: linear-gradient(160deg,#7fd0ff,#1d7fd6)"></div>
@@ -225,41 +229,68 @@
     </div>
 
     <script src="host.bundle.js"></script>
-    <script src="widget.js"></script>
     <script>
       // everything the page needs is in the query, so one template serves any widget
       const query = new URLSearchParams(location.search);
-      const id = query.get("id");
-      const position = query.get("position");
       const wallpaper = query.get("wallpaper") || "wallpaper.jpg";
+      const position = query.get("position");
+      const fill = query.get("fill") === "1";
       const app = query.get("app");
       const clock = query.get("clock");
-      const output = query.get("output") || "";
-      const placement = query.get("placement") || "";
 
       if (app) document.getElementById("app-name").textContent = app;
       if (clock) document.getElementById("clock").textContent = clock;
-      const slot = document.getElementById("gailan");
-      if (position) slot.className = position;
-      // a widget declares where it sits, the same declarations Gailan applies
-      if (placement) slot.style.cssText = "position: absolute;" + placement;
 
       // a missing wallpaper leaves the gradient underneath rather than a broken image
       const image = document.getElementById("wallpaper");
       image.addEventListener("error", () => image.removeAttribute("src"));
       image.src = wallpaper;
 
-      const registry = globalThis.__gailanWidgets || {};
-      const widget = id ? registry[id] : registry[Object.keys(registry)[0]];
+      let mounted = [];
+      try {
+        mounted = JSON.parse(query.get("widgets") || "[]");
+      } catch (err) {
+        console.warn("the widget list was not readable json");
+      }
 
-      if (!widget) {
-        slot.textContent = "no widget was bundled into this page";
-      } else {
-        let settings = {};
-        try {
-          settings = JSON.parse(query.get("settings") || "{}");
-        } catch (err) {
-          console.warn("settings were not readable json");
+      const desktop = document.getElementById("desktop");
+      const slots = [];
+
+      // one bundle per widget, named for it, loaded before anything is mounted
+      function load(src) {
+        return new Promise((resolve, reject) => {
+          const tag = document.createElement("script");
+          tag.src = src;
+          tag.onload = resolve;
+          tag.onerror = () => reject(new Error("could not load " + src));
+          document.head.appendChild(tag);
+        });
+      }
+
+      Promise.all(mounted.map((entry) => load(entry.id + ".js")))
+        .catch((err) => console.warn(err.message))
+        .then(place);
+
+      function place() {
+      const registry = globalThis.__gailanWidgets || {};
+
+      mounted.forEach((entry) => {
+        const widget = registry[entry.id];
+        const slot = document.createElement("div");
+        slot.className = "slot" + (position ? " " + position : "");
+        // a widget declares where it sits, the same declarations Gailan applies
+        if (!position && entry.placement) {
+          slot.style.cssText =
+            "position: absolute; width: fit-content; height: fit-content;" +
+            entry.placement;
+        }
+        // the dock is at the bottom, so widgets are inserted above it
+        desktop.insertBefore(slot, document.getElementById("dock"));
+        slots.push(slot);
+
+        if (!widget) {
+          slot.textContent = "no bundle for " + entry.id;
+          return;
         }
 
         const Component = widget.render
@@ -267,9 +298,42 @@
           : widget;
 
         window.__mount(
-          window.React.createElement(Component, {output, settings}),
+          window.React.createElement(Component, {
+            output: entry.output || "",
+            settings: entry.settings || {},
+          }),
           slot
         );
+      });
+
+      // A lone widget is a portrait of that widget, so it is scaled up until it
+      // nearly fills the frame. Waiting a beat lets it render first: there is
+      // nothing to measure before that.
+      if (fill && slots.length === 1) {
+        setTimeout(() => {
+          const slot = slots[0];
+          // the widget itself, not the slot holding it
+          const drawn = slot.firstElementChild || slot;
+          const box = drawn.getBoundingClientRect();
+          if (!box.width || !box.height) return;
+
+          const bar = 25;
+          const dock = 82;
+          const room = {
+            width: desktop.clientWidth * 0.78,
+            height: (desktop.clientHeight - bar - dock) * 0.86,
+          };
+          const scale = Math.min(room.width / box.width, room.height / box.height);
+          if (scale <= 1) return;
+
+          slot.style.cssText =
+            "position: absolute;" +
+            "width: fit-content; height: fit-content;" +
+            "left: 50%;" +
+            "top: " + (bar + (desktop.clientHeight - bar - dock) / 2) + "px;" +
+            "transform: translate(-50%, -50%) scale(" + scale.toFixed(3) + ");";
+        }, 700);
+      }
       }
     </script>
   </body>

@@ -12,11 +12,12 @@
 //
 'use strict';
 
-// Puts a widget on a desktop and photographs it, so every preview in the hub is
+// Puts widgets on a desktop and photographs them, so every preview in the hub is
 // framed the same way.
 //
-//   npm run screenshot clock
-//   npm run screenshot clock -- --position=left --wallpaper=/path/to/your.jpg
+//   npm run screenshot clock                       one widget, filling the frame
+//   npm run screenshot -- --widgets=clock,memory    several, where each sits
+//   npm run screenshot clock -- --theme=dark
 //
 // With electron available the capture is automatic. Without it, the page is served
 // and you are told where to look, which is enough on a Mac where the screenshot
@@ -45,98 +46,126 @@ const WIDTH = 1280;
 const HEIGHT = 800;
 const SCALE = 2;
 // A desktop is mostly wallpaper, and a wallpaper is a photograph. The same frame is
-// 1.3MB as a png and 126KB as a jpeg, so it is written as a jpeg at a size that
+// 1.3MB as a png and 130KB as a jpeg, so it is written as a jpeg at a size that
 // still holds up when someone opens it.
 const OUTPUT_WIDTH = 1920;
 const QUALITY = 86;
 
+const args = process.argv.slice(2);
+
 function usage(message) {
   console.error(message);
   console.error('\nusage: npm run screenshot <widget> [-- options]');
+  console.error('  --widgets=a,b,c       several widgets on one desktop');
+  console.error('  --fill / --no-fill    scale a lone widget up to fill the frame');
   console.error('  --position=right|left|centre   overrides the widget\'s own');
-  console.error('  --theme=light|dark             which appearance to render');
-  console.error('  --output=<text>                stand in for the command output');
-  console.error('  --wallpaper=<path>             an image of your own');
-  console.error('  --settings=<json>              settings to render with');
-  console.error('  --out=<path>                   where to write the png');
+  console.error('  --theme=light|dark    which appearance to render');
+  console.error('  --output=<text>       stand in for the command output');
+  console.error('  --outputs=<json>      per widget, as {"memory": "45"}');
+  console.error('  --settings=<json>     settings to render with');
+  console.error('  --wallpaper=<path>    an image of your own');
+  console.error('  --assets=<dir>        more files the widgets load');
+  console.error('  --dir=<path>          a widget folder somewhere else');
+  console.error('  --out=<path>          where to write it');
   process.exit(1);
 }
-
-const args = process.argv.slice(2);
-const name = args.find((a) => !a.startsWith('-'));
-if (!name) usage('which widget?');
 
 function option(key, fallback) {
   const found = args.find((a) => a.startsWith(`--${key}=`));
   return found ? found.slice(key.length + 3) : fallback;
 }
 
-const widgetDir = path.join(root, 'widgets', name);
-if (!fs.existsSync(widgetDir)) usage(`there is no widgets/${name}`);
+function flag(key) {
+  if (args.includes(`--no-${key}`)) return false;
+  if (args.includes(`--${key}`)) return true;
+  return null;
+}
 
-const manifest = JSON.parse(
-  fs.readFileSync(path.join(widgetDir, 'widget.json'), 'utf8')
+// MARK: - which widgets, and where they live
+
+const supplied = option('dir', null);
+const named = option('widgets', null);
+const positional = args.find((a) => !a.startsWith('-'));
+
+if (!named && !positional && !supplied) usage('which widget?');
+
+const widgets = (named ? named.split(',') : [positional])
+  .filter(Boolean)
+  .map((name) => {
+    const dir = supplied ? path.resolve(supplied) : path.join(root, 'widgets', name);
+    if (!fs.existsSync(dir)) usage(`there is nothing at ${dir}`);
+
+    const manifestPath = path.join(dir, 'widget.json');
+    if (!fs.existsSync(manifestPath)) usage(`there is no widget.json in ${dir}`);
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+    // a manifest need not name its entry: a widget in a folder is usually an index
+    const candidates = manifest.entry
+      ? [manifest.entry]
+      : ['index.tsx', 'index.jsx', 'index.ts', 'index.js'];
+    const entry = candidates
+      .map((file) => path.join(dir, file))
+      .find((file) => fs.existsSync(file));
+    if (!entry) usage(`none of ${candidates.join(', ')} is in ${dir}`);
+
+    return {
+      id: manifest.name || path.basename(dir),
+      dir,
+      entry,
+      manifest,
+    };
+  });
+
+const single = widgets.length === 1;
+// one widget on its own is a portrait of that widget, so it fills the frame unless
+// told otherwise. several are a desktop, and sit where their authors put them.
+const fill = flag('fill') === null ? single : flag('fill');
+
+const out = path.resolve(
+  option(
+    'out',
+    single
+      ? path.join(widgets[0].dir, 'preview.jpg')
+      : path.join(process.cwd(), 'desktop.jpg')
+  )
 );
-const entry = path.join(widgetDir, manifest.entry);
-if (!fs.existsSync(entry)) usage(`${manifest.entry} is not in widgets/${name}`);
 
-const out = path.resolve(option('out', path.join(widgetDir, 'preview.jpg')));
-const position = option('position', 'right');
-const settings = option('settings', JSON.stringify(defaultSettings(manifest)));
+const position = option('position', '');
+const theme = option('theme', 'light');
 
-function defaultSettings(m) {
+function defaultSettings(manifest) {
   const values = {};
-  (m.settings || []).forEach((setting) => {
+  (manifest.settings || []).forEach((setting) => {
     if (setting.default !== undefined) values[setting.key] = setting.default;
   });
   return values;
 }
 
-// MARK: - the pieces the page needs
+// MARK: - reading what a widget exports, so its command can be run
 
-// async because a plugin is involved, and esbuild will not take one otherwise
-function buildWidget(dir) {
-  const registry = 'globalThis.__gailanWidgets';
-
-  return esbuild.build({
-    entryPoints: [entry],
-    outfile: path.join(dir, 'widget.js'),
-    bundle: true,
-    format: 'iife',
-    globalName: '__gailanWidget',
-    footer: {
-      js:
-        `${registry}=${registry}||{};` +
-        `${registry}[${JSON.stringify(manifest.name)}]=` +
-        '__gailanWidget&&__gailanWidget.default!==undefined&&' +
-        'Object.keys(__gailanWidget).length===1' +
-        '?__gailanWidget.default:__gailanWidget;',
-    },
-    jsx: 'transform',
-    jsxFactory: 'html',
-    target: ['safari16.6'],
-    platform: 'browser',
-    // the widget asks the page for these rather than bundling its own copies,
-    // which is also how Gailan runs it
-    external: ['gailan', 'uebersicht', 'react'],
-    plugins: [hostModules()],
-    logLevel: 'warning',
-  });
-}
-
-// gailan and uebersicht are provided by the page, as they are in the app
-function hostModules() {
+function hostStubs() {
   return {
-    name: 'host-modules',
+    name: 'host-stubs',
     setup(build) {
       build.onResolve({filter: /^(gailan|uebersicht|react)$/}, (args) => ({
         path: args.path,
-        namespace: 'host',
+        namespace: 'stub',
       }));
-      build.onLoad({filter: /.*/, namespace: 'host'}, (args) => ({
-        contents: `module.exports = globalThis.require(${JSON.stringify(
-          args.path
-        )});`,
+      // enough of the module for the top of a widget file to run: it builds styled
+      // components, which never render here
+      build.onLoad({filter: /.*/, namespace: 'stub'}, () => ({
+        contents: `
+          const component = () => null;
+          const tag = () => component;
+          module.exports = {
+            styled: new Proxy(tag, {get: () => tag}),
+            css: () => '',
+            React: {createElement: () => null},
+            createElement: () => null,
+            run: async () => '',
+            default: {createElement: () => null},
+          };
+        `,
         loader: 'js',
       }));
     },
@@ -144,48 +173,20 @@ function hostModules() {
 }
 
 // Gailan runs a widget's command and hands it the output, so a screenshot taken
-// without doing the same shows an empty widget. The widget is built a second time
-// for node, purely to read what it exports.
-function readExports(dir) {
-  const file = path.join(dir, 'widget.node.cjs');
+// without doing the same shows an empty widget.
+function readExports(widget, dir) {
+  const file = path.join(dir, `${widget.id}.node.cjs`);
 
   return esbuild
     .build({
-      entryPoints: [entry],
+      entryPoints: [widget.entry],
       outfile: file,
       bundle: true,
       format: 'cjs',
       platform: 'node',
       jsx: 'transform',
       jsxFactory: 'html',
-      plugins: [
-        {
-          name: 'host-stubs',
-          setup(build) {
-            build.onResolve({filter: /^(gailan|uebersicht|react)$/}, (args) => ({
-              path: args.path,
-              namespace: 'stub',
-            }));
-            // enough of the module for the top of a widget file to run: it builds
-            // styled components, which never render here
-            build.onLoad({filter: /.*/, namespace: 'stub'}, () => ({
-              contents: `
-                const component = () => null;
-                const tag = () => component;
-                module.exports = {
-                  styled: new Proxy(tag, {get: () => tag}),
-                  css: () => '',
-                  React: {createElement: () => null},
-                  createElement: () => null,
-                  run: async () => '',
-                  default: {createElement: () => null},
-                };
-              `,
-              loader: 'js',
-            }));
-          },
-        },
-      ],
+      plugins: [hostStubs()],
       logLevel: 'silent',
     })
     .then(() => {
@@ -202,12 +203,60 @@ function runCommand(command) {
   try {
     return execFileSync(process.env.SHELL || '/bin/sh', ['-c', command], {
       encoding: 'utf8',
-      timeout: 10000,
+      timeout: 15000,
     });
   } catch (err) {
-    console.warn(`the widget's command failed, so it renders with nothing: ${err.message}`);
+    // a widget that reads something this machine does not have is not a failure
+    console.warn(`${command.split(' ')[0]} said nothing useful, so --outputs helps`);
     return '';
   }
+}
+
+// MARK: - building for the browser
+
+function buildWidget(widget, dir) {
+  const registry = 'globalThis.__gailanWidgets';
+
+  return esbuild.build({
+    entryPoints: [widget.entry],
+    outfile: path.join(dir, `${widget.id}.js`),
+    bundle: true,
+    format: 'iife',
+    globalName: '__gailanWidget',
+    footer: {
+      js:
+        `${registry}=${registry}||{};` +
+        `${registry}[${JSON.stringify(widget.id)}]=` +
+        '__gailanWidget&&__gailanWidget.default!==undefined&&' +
+        'Object.keys(__gailanWidget).length===1' +
+        '?__gailanWidget.default:__gailanWidget;',
+    },
+    jsx: 'transform',
+    jsxFactory: 'html',
+    target: ['safari16.6'],
+    platform: 'browser',
+    plugins: [browserHostModules()],
+    logLevel: 'warning',
+  });
+}
+
+// gailan and uebersicht are provided by the page, as they are in the app
+function browserHostModules() {
+  return {
+    name: 'host-modules',
+    setup(build) {
+      build.onResolve({filter: /^(gailan|uebersicht|react)$/}, (args) => ({
+        path: args.path,
+        namespace: 'host',
+      }));
+      build.onLoad({filter: /.*/, namespace: 'host'}, (args) => ({
+        contents: `module.exports = globalThis.require(${JSON.stringify(
+          args.path
+        )});`,
+        loader: 'js',
+      }));
+    },
+  };
 }
 
 function buildHost(dir) {
@@ -259,7 +308,14 @@ function wallpaper(dir) {
   if (!fs.existsSync(cached)) {
     console.log('fetching the wallpaper, once');
     try {
-      execFileSync('curl', ['-fsSL', '--max-time', '120', '-o', cached, WALLPAPER_URL]);
+      execFileSync('curl', [
+        '-fsSL',
+        '--max-time',
+        '120',
+        '-o',
+        cached,
+        WALLPAPER_URL,
+      ]);
     } catch (err) {
       console.warn('could not fetch it, so the gradient stands in');
       return false;
@@ -287,7 +343,9 @@ function serve(dir, callback) {
       res.writeHead(404);
       return res.end('not here');
     }
-    res.writeHead(200, {'content-type': types[path.extname(file)] || 'text/plain'});
+    res.writeHead(200, {
+      'content-type': types[path.extname(file)] || 'text/plain',
+    });
     fs.createReadStream(file).pipe(res);
   });
 
@@ -300,6 +358,19 @@ function electron() {
 
   const which = spawnSync('which', ['electron'], {encoding: 'utf8'});
   return which.status === 0 ? which.stdout.trim() : null;
+}
+
+function report(measured) {
+  const [width, height] = measured.desktop;
+  measured.widgets.forEach((widget) => {
+    const across = ((widget.width / width) * 100).toFixed(0);
+    const down = ((widget.height / height) * 100).toFixed(0);
+    console.log(
+      `  ${widget.width}x${widget.height} at ${widget.x},${widget.y}` +
+        ` (${across}% across, ${down}% down)` +
+        (widget.text ? ` "${widget.text}"` : '')
+    );
+  });
 }
 
 function capture(binary, url, done) {
@@ -315,12 +386,34 @@ function capture(binary, url, done) {
     app.whenReady().then(async () => {
       // widgets answer prefers-color-scheme, so the screenshot has to pick one
       nativeTheme.themeSource = ${JSON.stringify(theme)};
+
       const win = new BrowserWindow({
         width: ${WIDTH}, height: ${HEIGHT}, show: false, useContentSize: true,
       });
       await win.loadURL(${JSON.stringify(url)});
-      // fonts, the wallpaper and any first render
-      await new Promise((r) => setTimeout(r, 4000));
+      // fonts, the wallpaper, the first render, and any scaling after it
+      await new Promise((r) => setTimeout(r, 4500));
+
+      // what actually landed on the desktop, so a run can be checked without
+      // opening the file
+      const measured = await win.webContents.executeJavaScript(\`
+        JSON.stringify({
+          desktop: [
+            document.getElementById('desktop').clientWidth,
+            document.getElementById('desktop').clientHeight,
+          ],
+          widgets: [...document.querySelectorAll('.slot')].map((slot) => {
+            const box = (slot.firstElementChild || slot).getBoundingClientRect();
+            return {
+              text: (slot.textContent || '').trim().slice(0, 28),
+              x: Math.round(box.x), y: Math.round(box.y),
+              width: Math.round(box.width), height: Math.round(box.height),
+            };
+          }),
+        })
+      \`);
+      console.log('GEOMETRY ' + measured);
+
       const shot = await win.webContents.capturePage({
         x: 0, y: 0, width: ${WIDTH}, height: ${HEIGHT},
       });
@@ -345,6 +438,12 @@ function capture(binary, url, done) {
 
   let noise = '';
   run.stderr.on('data', (chunk) => (noise += chunk));
+  run.stdout.on('data', (chunk) => {
+    String(chunk)
+      .split('\n')
+      .filter((line) => line.startsWith('GEOMETRY '))
+      .forEach((line) => report(JSON.parse(line.slice(9))));
+  });
 
   run.on('error', (err) => done(err.message));
   run.on('exit', (code) => {
@@ -356,81 +455,101 @@ function capture(binary, url, done) {
 // MARK: - go
 
 const work = fs.mkdtempSync(path.join(os.tmpdir(), 'gailan-shot-'));
-fs.copyFileSync(
-  path.join(template, 'desktop.html'),
-  path.join(work, 'index.html')
-);
+fs.copyFileSync(path.join(template, 'desktop.html'), path.join(work, 'index.html'));
 
 // a widget may sit beside files it loads, images among them
-fs.readdirSync(widgetDir).forEach((file) => {
-  const from = path.join(widgetDir, file);
-  if (fs.statSync(from).isFile() && !/\.(tsx?|jsx?)$/.test(file)) {
-    fs.copyFileSync(from, path.join(work, file));
-  }
-});
+function stage(from) {
+  fs.readdirSync(from).forEach((file) => {
+    const source = path.join(from, file);
+    if (fs.statSync(source).isFile() && !/\.(tsx?|jsx?)$/.test(file)) {
+      fs.copyFileSync(source, path.join(work, file));
+    }
+  });
+}
+
+widgets.forEach((widget) => stage(widget.dir));
+
+// and it may load files kept alongside the whole widgets folder rather than its own,
+// which --assets brings along
+const assets = option('assets', null);
+if (assets) {
+  if (!fs.existsSync(assets)) usage(`there is nothing at ${assets}`);
+  stage(path.resolve(assets));
+}
 
 buildHost(work);
 const framed = wallpaper(work);
 
-const theme = option('theme', 'light');
-
-function pageURL(port, output, placement) {
-  return (
-    `http://127.0.0.1:${port}/index.html` +
-    `?id=${encodeURIComponent(manifest.name)}` +
-    `&position=${encodeURIComponent(position)}` +
-    `&settings=${encodeURIComponent(settings)}` +
-    `&output=${encodeURIComponent(output || '')}` +
-    `&placement=${encodeURIComponent(placement || '')}` +
-    (framed ? '' : '&wallpaper=')
-  );
+let overrides = {};
+try {
+  overrides = JSON.parse(option('outputs', '{}'));
+} catch (err) {
+  usage('--outputs is not readable json');
 }
 
-readExports(work)
-  .then((exports) => {
-    const output = option('output', runCommand(exports.command));
-    // the author says where their widget sits, unless asked for somewhere else
-    const placement = args.some((a) => a.startsWith('--position='))
-      ? ''
-      : exports.className || '';
-    return buildWidget(work).then(() => start(output, placement));
-  })
+Promise.all(
+  widgets.map((widget) =>
+    readExports(widget, work).then((exports) => {
+      const output =
+        overrides[widget.id] !== undefined
+          ? overrides[widget.id]
+          : option('output', runCommand(exports.command));
+
+      return buildWidget(widget, work).then(() => ({
+        id: widget.id,
+        output,
+        // the author says where their widget sits, unless asked for somewhere else
+        placement: position ? '' : exports.className || '',
+        settings: option('settings', null)
+          ? JSON.parse(option('settings'))
+          : defaultSettings(widget.manifest),
+      }));
+    })
+  )
+)
+  .then(start)
   .catch((err) => {
     console.error(err.message || err);
     process.exit(1);
   });
 
-function start(output, placement) {
+function start(mounted) {
   serve(work, (server, port) => {
-  const url = pageURL(port, output, placement);
-  const binary = electron();
+    const query =
+      `?widgets=${encodeURIComponent(JSON.stringify(mounted))}` +
+      `&position=${encodeURIComponent(position)}` +
+      `&fill=${fill ? '1' : '0'}` +
+      (framed ? '' : '&wallpaper=');
 
-  if (!binary) {
-    console.log('\nelectron is not here, so nothing was captured for you.');
-    console.log(`the desktop is at ${url}`);
-    console.log(
-      `capture the ${WIDTH}x${HEIGHT} frame at the top left, at 2x, and save it as`
-    );
-    console.log(`  ${out}`);
-    console.log('\npress ctrl-c when you have it.');
-    return;
-  }
+    const url = `http://127.0.0.1:${port}/index.html${query}`;
+    const binary = electron();
 
-  capture(binary, url, (err) => {
-    server.close();
-    fs.rmSync(work, {recursive: true, force: true});
-
-    if (err) {
-      console.error('the capture did not work:', err);
-      process.exit(1);
+    if (!binary) {
+      console.log('\nelectron is not here, so nothing was captured for you.');
+      console.log(`the desktop is at ${url}`);
+      console.log(
+        `capture the ${WIDTH}x${HEIGHT} frame at the top left, at 2x, and save it as`
+      );
+      console.log(`  ${out}`);
+      console.log('\npress ctrl-c when you have it.');
+      return;
     }
 
-    const {size} = fs.statSync(out);
-    console.log(
-      `${path.relative(process.cwd(), out)}: ${OUTPUT_WIDTH}x${Math.round(
-        (OUTPUT_WIDTH * HEIGHT) / WIDTH
-      )}, ${(size / 1024).toFixed(0)}KB`
-    );
-  });
+    capture(binary, url, (err) => {
+      server.close();
+      fs.rmSync(work, {recursive: true, force: true});
+
+      if (err) {
+        console.error('the capture did not work:', err);
+        process.exit(1);
+      }
+
+      const {size} = fs.statSync(out);
+      console.log(
+        `${path.relative(process.cwd(), out)}: ${OUTPUT_WIDTH}x${Math.round(
+          (OUTPUT_WIDTH * HEIGHT) / WIDTH
+        )}, ${(size / 1024).toFixed(0)}KB`
+      );
+    });
   });
 }
