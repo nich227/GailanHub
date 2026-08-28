@@ -1,20 +1,19 @@
 # Clock
 
-The time to the minute, the date, and the day of the year.
+The time, the date, and how far through the year you are.
 
-## What it runs
+Two faces, chosen in the widget's settings:
 
-    date '+%H:%M|%a %d %b|%j'
+- **Digital** shows the numerals on a dot matrix, which is where the industrial look
+  comes from: a readout built out of lit cells rather than drawn strokes. Seconds sit
+  beside the time in red.
+- **Analog** shows hands on a dial with sixty marks and no numerals, the quarters
+  longer than the rest. The hour hand moves through the hour rather than jumping at the
+  top of it, and the second hand is the one red thing on it.
 
-`date` is part of macOS, so there is nothing to install. Nothing is fetched over
-the network.
+Both tick every second, because both show seconds.
 
-## Settings
-
-Move it by editing `className` in `index.tsx`. `refreshFrequency` is ten seconds,
-which is enough for a clock that only shows minutes; lower it and you are asking
-your Mac to redraw for nothing.
-
-## License
-
-MIT, © 2026 Kevin Chen.
+The dot matrix numerals are [DotGothic16](https://github.com/fontworks-fonts/DotGothic16)
+under the SIL Open Font License, which is in `dotmatrix-OFL.txt`. The file beside this
+one holds only the digits and the colon, so it costs 2KB rather than the 2MB of the full
+face.

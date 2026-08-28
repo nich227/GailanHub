@@ -368,6 +368,7 @@ function electron() {
 
 function report(measured) {
   const [width, height] = measured.desktop;
+  (measured.fonts || []).forEach((font) => console.log(`  font: ${font}`));
   (measured.animations || []).forEach((animation) =>
     console.log(`  moving: ${animation}`)
   );
@@ -377,6 +378,7 @@ function report(measured) {
     console.log(
       `  ${widget.width}x${widget.height} at ${widget.x},${widget.y}` +
         ` (${across}% across, ${down}% down)` +
+        (widget.lines ? ` ${widget.lines} drawn lines` : '') +
         (widget.text ? ` "${widget.text}"` : '')
     );
   });
@@ -411,15 +413,22 @@ function capture(binary, url, done) {
             document.getElementById('desktop').clientWidth,
             document.getElementById('desktop').clientHeight,
           ],
+          // a widget may ship a typeface, and a fallback looks fine until you
+          // compare it to the real thing
+          fonts: [...document.fonts].map((f) => f.family + ' ' + f.status),
           // anything set to move, so a widget that should beat can be seen to
           animations: [...document.querySelectorAll('.slot *')]
             .map((el) => getComputedStyle(el))
             .filter((style) => style.animationName !== 'none')
             .map((style) => style.animationName + ' ' + style.animationDuration),
           widgets: [...document.querySelectorAll('.slot')].map((slot) => {
-            const box = (slot.firstElementChild || slot).getBoundingClientRect();
+            // the slot takes the widget's size, so it is the honest thing to
+            // measure: a widget may render a <style> first, which has none
+            const box = slot.getBoundingClientRect();
             return {
-              text: (slot.textContent || '').trim().slice(0, 28),
+              // innerText, so a font-face rule is not mistaken for the readout
+              text: (slot.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 30),
+              lines: slot.querySelectorAll('svg line').length,
               x: Math.round(box.x), y: Math.round(box.y),
               width: Math.round(box.width), height: Math.round(box.height),
             };

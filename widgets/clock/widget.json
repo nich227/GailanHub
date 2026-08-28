@@ -1,14 +1,33 @@
 {
   "name": "clock",
   "title": "Clock",
-  "description": "The time, the date, and how far through the year you are",
+  "description": "The time, the date, and how far through the year you are, on a dot matrix or a dial",
   "author": "Kevin Chen",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "entry": "index.tsx",
   "tags": [
     "time"
   ],
   "minimumGailanVersion": "1.0.0",
-  "screenshotOutput": "09:41|00|Thu 27 Aug|239"
+  "screenshotOutput": "09:41|00|Thu 27 Aug|239",
+  "settings": [
+    {
+      "key": "face",
+      "type": "choice",
+      "label": "Face",
+      "help": "Numerals on a dot matrix, or hands on a dial",
+      "default": "digital",
+      "options": [
+        {
+          "value": "digital",
+          "label": "Digital"
+        },
+        {
+          "value": "analog",
+          "label": "Analog"
+        }
+      ]
+    }
+  ]
 }

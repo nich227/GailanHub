@@ -323,8 +323,7 @@
           let top = BAR + INSET;
 
           slots.forEach((slot) => {
-            const drawn = slot.firstElementChild || slot;
-            const box = drawn.getBoundingClientRect();
+            const box = slot.getBoundingClientRect();
 
             slot.style.cssText =
               "position: absolute;" +
@@ -350,9 +349,9 @@
       if (fill && slots.length === 1) {
         setTimeout(() => {
           const slot = slots[0];
-          // the widget itself, not the slot holding it
-          const drawn = slot.firstElementChild || slot;
-          const box = drawn.getBoundingClientRect();
+          // the slot is fit-content, so its box is the widget's box, whatever the
+          // widget chose to render first
+          const box = slot.getBoundingClientRect();
           if (!box.width || !box.height) return;
 
           const room = {

@@ -4,10 +4,10 @@
     {
       "name": "clock",
       "title": "Clock",
-      "description": "The time, the date, and how far through the year you are",
+      "description": "The time, the date, and how far through the year you are, on a dot matrix or a dial",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.0.0",
+      "version": "1.2.0",
       "tags": [
         "time"
       ],
@@ -17,20 +17,28 @@
       "entry": "index.tsx",
       "files": [
         {
+          "path": "dotmatrix-OFL.txt",
+          "bytes": 4492
+        },
+        {
+          "path": "dotmatrix.ttf",
+          "bytes": 2456
+        },
+        {
           "path": "index.tsx",
-          "bytes": 3319
+          "bytes": 6675
         },
         {
           "path": "preview.jpg",
-          "bytes": 132629
+          "bytes": 124827
         },
         {
           "path": "README.md",
-          "bytes": 458
+          "bytes": 866
         },
         {
           "path": "widget.json",
-          "bytes": 323
+          "bytes": 725
         }
       ]
     },
