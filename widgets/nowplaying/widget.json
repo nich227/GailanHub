@@ -1,14 +1,23 @@
 {
   "name": "nowplaying",
   "title": "Now Playing",
-  "description": "What Spotify or Music is playing, with the cover, and nothing when neither is",
+  "description": "What Spotify or Music is playing, with the cover and controls",
   "author": "Kevin Chen",
   "license": "MIT",
-  "version": "1.2.0",
+  "version": "1.6.0",
   "entry": "index.tsx",
   "tags": [
     "music"
   ],
   "minimumGailanVersion": "1.0.0",
-  "screenshotOutput": "Human Nature|Michael Jackson|playing|sample-cover.jpg"
+  "screenshotOutput": "Human Nature|Michael Jackson|playing|sample-cover.jpg",
+  "settings": [
+    {
+      "key": "draggable",
+      "type": "toggle",
+      "label": "Drag to move",
+      "help": "Hold and drag the widget to place it. Needs interaction turned on in Gailan.",
+      "default": false
+    }
+  ]
 }

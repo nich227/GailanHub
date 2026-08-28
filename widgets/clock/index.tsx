@@ -61,7 +61,22 @@ const Panel = styled("div")`
   /* flat, not glassy: the surface does not pretend to be lit */
   background: rgba(11, 11, 12, 0.82);
   border: 1px solid var(--rule);
-  border-radius: 4px;
+  /* A squircle, as far as the web will allow. corner-shape is new enough that the
+     WebKit Gailan runs on does not have it, so a generous radius carries the shape
+     and the real thing is taken where it is offered. */
+  border-radius: 18px;
+
+  @supports (corner-shape: squircle) {
+    corner-shape: squircle;
+    border-radius: 26%;
+  }
+  &[data-draggable="true"] {
+    cursor: grab;
+  }
+
+  &[data-draggable="true"]:active {
+    cursor: grabbing;
+  }
   color: var(--ink);
   font-family: "SF Mono", ui-monospace, Menlo, monospace;
 
@@ -245,13 +260,87 @@ function Ticks() {
   );
 }
 
-type Settings = { face?: string };
+type Settings = { face?: string; draggable?: boolean };
+/* ---------- moving it about ---------- */
+
+/* Gailan puts a widget where its className says. Dragging has to override that, so
+   the position lives outside render, in localStorage, and is written onto the element
+   Gailan positions rather than onto the panel inside it. That survives the re-render
+   this widget does every second. */
+const POSITION_KEY = "gailan.clock.position";
+
+let position: { left: number; top: number } | null = null;
+try {
+  position = JSON.parse(localStorage.getItem(POSITION_KEY) || "null");
+} catch (err) {
+  /* first run, or a browser that will not remember */
+}
+
+/* the panel is inside the box Gailan positions, which is the one that has to move */
+const boxOf = (el: HTMLElement) => (el.parentElement as HTMLElement) || el;
+
+const place = (el: HTMLElement | null) => {
+  if (!el || !position) return;
+  const box = boxOf(el);
+  box.style.left = `${position.left}px`;
+  box.style.top = `${position.top}px`;
+  /* whichever edge the className pinned it to, it is not pinned there now */
+  box.style.right = "auto";
+  box.style.bottom = "auto";
+};
+
+const startDrag = (event: any) => {
+  if (event.button !== 0) return;
+  const box = boxOf(event.currentTarget as HTMLElement);
+  event.preventDefault();
+
+  const rect = box.getBoundingClientRect();
+  const grabX = event.clientX - rect.left;
+  const grabY = event.clientY - rect.top;
+
+  const onMove = (moved: MouseEvent) => {
+    /* far enough onto the screen to still be caught hold of */
+    const left = Math.max(
+      0,
+      Math.min(window.innerWidth - rect.width, moved.clientX - grabX)
+    );
+    const top = Math.max(
+      0,
+      Math.min(window.innerHeight - 40, moved.clientY - grabY)
+    );
+    box.style.left = `${left}px`;
+    box.style.top = `${top}px`;
+    box.style.right = "auto";
+    box.style.bottom = "auto";
+    position = { left, top };
+  };
+
+  const onUp = () => {
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+    try {
+      localStorage.setItem(POSITION_KEY, JSON.stringify(position));
+    } catch (err) {
+      /* it holds for this session either way */
+    }
+  };
+
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+};
+
 type State = { output: string; error?: string; settings?: Settings };
 
 export const render = ({ output, error, settings }: State) => {
+  const draggable = settings?.draggable === true;
+
   if (error) {
     return (
-      <Panel>
+      <Panel
+        data-draggable={draggable}
+        ref={place}
+        onMouseDown={draggable ? startDrag : undefined}
+      >
         <Marks>
           <Mark>clock</Mark>
         </Marks>
@@ -266,7 +355,12 @@ export const render = ({ output, error, settings }: State) => {
   const [hours, minutes] = (time || "").split(":").map(Number);
 
   return (
-    <Panel data-gailan-desktop-glass={4}>
+    <Panel
+      data-gailan-desktop-glass={4}
+      data-draggable={draggable}
+      ref={place}
+      onMouseDown={draggable ? startDrag : undefined}
+    >
       <Face />
 
       <Marks>

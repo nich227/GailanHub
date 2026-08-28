@@ -370,6 +370,7 @@ function report(measured) {
   const [width, height] = measured.desktop;
   (measured.fonts || []).forEach((font) => console.log(`  font: ${font}`));
   (measured.images || []).forEach((image) => console.log(`  image: ${image}`));
+  (measured.states || []).forEach((state) => console.log(`  state: ${state}`));
   (measured.animations || []).forEach((animation) =>
     console.log(`  moving: ${animation}`)
   );
@@ -417,6 +418,12 @@ function capture(binary, url, done) {
           // a widget may ship a typeface, and a fallback looks fine until you
           // compare it to the real thing
           fonts: [...document.fonts].map((f) => f.family + ' ' + f.status),
+          // anything a widget marks with a state, and the colour it ended up: a
+          // lamp meant to change with what it reports is worth checking
+          states: [...document.querySelectorAll('.slot [data-state]')].map(
+            (el) =>
+              el.dataset.state + ' ' + getComputedStyle(el).backgroundColor
+          ),
           // an image that did not arrive leaves a gap the capture will happily keep
           images: [...document.querySelectorAll('.slot img')].map(
             (img) =>
@@ -521,13 +528,20 @@ try {
 Promise.all(
   widgets.map((widget) =>
     readExports(widget, work).then((exports) => {
+      // asked for beats pinned, pinned beats running the command: a flag given on
+      // the command line is the whole point of giving it
+      const asked = args.some((a) => a.startsWith('--output='))
+        ? option('output', '')
+        : undefined;
       const pinned = widget.manifest.screenshotOutput;
       const output =
         overrides[widget.id] !== undefined
           ? overrides[widget.id]
-          : pinned !== undefined
-            ? pinned
-            : option('output', runCommand(exports.command));
+          : asked !== undefined
+            ? asked
+            : pinned !== undefined
+              ? pinned
+              : runCommand(exports.command);
 
       return buildWidget(widget, work).then(() => ({
         id: widget.id,

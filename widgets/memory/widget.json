@@ -4,11 +4,20 @@
   "description": "How much of your memory is in use, on a scale you can read a value off",
   "author": "Kevin Chen",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "entry": "index.tsx",
   "tags": [
     "system"
   ],
   "minimumGailanVersion": "1.0.0",
-  "screenshotOutput": "42"
+  "screenshotOutput": "42",
+  "settings": [
+    {
+      "key": "draggable",
+      "type": "toggle",
+      "label": "Drag to move",
+      "help": "Hold and drag the widget to place it. Needs interaction turned on in Gailan.",
+      "default": false
+    }
+  ]
 }

@@ -7,7 +7,7 @@
       "description": "The time, the date, and how far through the year you are, on a dot matrix or a dial",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.2.0",
+      "version": "1.4.0",
       "tags": [
         "time"
       ],
@@ -22,19 +22,19 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 10264
+          "bytes": 13243
         },
         {
           "path": "preview.jpg",
-          "bytes": 124827
+          "bytes": 125766
         },
         {
           "path": "README.md",
-          "bytes": 1018
+          "bytes": 1304
         },
         {
           "path": "widget.json",
-          "bytes": 725
+          "bytes": 936
         }
       ]
     },
@@ -44,7 +44,7 @@
       "description": "How much of your memory is in use, on a scale you can read a value off",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.0.0",
+      "version": "1.2.0",
       "tags": [
         "system"
       ],
@@ -55,29 +55,29 @@
       "files": [
         {
           "path": "index.tsx",
-          "bytes": 4039
+          "bytes": 7181
         },
         {
           "path": "preview.jpg",
-          "bytes": 123805
+          "bytes": 124741
         },
         {
           "path": "README.md",
-          "bytes": 425
+          "bytes": 666
         },
         {
           "path": "widget.json",
-          "bytes": 320
+          "bytes": 551
         }
       ]
     },
     {
       "name": "nowplaying",
       "title": "Now Playing",
-      "description": "What Spotify or Music is playing, with the cover, and nothing when neither is",
+      "description": "What Spotify or Music is playing, with the cover and controls",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.2.0",
+      "version": "1.6.0",
       "tags": [
         "music"
       ],
@@ -88,15 +88,15 @@
       "files": [
         {
           "path": "index.tsx",
-          "bytes": 6017
+          "bytes": 12673
         },
         {
           "path": "preview.jpg",
-          "bytes": 133158
+          "bytes": 135092
         },
         {
           "path": "README.md",
-          "bytes": 1151
+          "bytes": 1829
         },
         {
           "path": "sample-cover.jpg",
@@ -104,7 +104,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 386
+          "bytes": 601
         }
       ]
     }

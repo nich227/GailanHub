@@ -18,3 +18,10 @@ under the SIL Open Font License, which is in `dotmatrix-OFL.txt`. Only the ten d
 the colon are included, 2KB against the 2MB of the full face, and they are carried inside
 `index.tsx` rather than sitting beside it: Gailan serves a widget's files under its folder
 name, so a path would break the moment you renamed the folder.
+
+## Settings
+
+- **Face** picks the dot matrix or the dial.
+- **Drag to move** lets you hold the panel and put it where you like. It needs
+  interaction turned on in Gailan's preferences, since a widget cannot be dragged if
+  clicks never reach it, and where you leave it is remembered.
