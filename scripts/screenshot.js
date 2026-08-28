@@ -368,6 +368,9 @@ function electron() {
 
 function report(measured) {
   const [width, height] = measured.desktop;
+  (measured.animations || []).forEach((animation) =>
+    console.log(`  moving: ${animation}`)
+  );
   measured.widgets.forEach((widget) => {
     const across = ((widget.width / width) * 100).toFixed(0);
     const down = ((widget.height / height) * 100).toFixed(0);
@@ -408,6 +411,11 @@ function capture(binary, url, done) {
             document.getElementById('desktop').clientWidth,
             document.getElementById('desktop').clientHeight,
           ],
+          // anything set to move, so a widget that should beat can be seen to
+          animations: [...document.querySelectorAll('.slot *')]
+            .map((el) => getComputedStyle(el))
+            .filter((style) => style.animationName !== 'none')
+            .map((style) => style.animationName + ' ' + style.animationDuration),
           widgets: [...document.querySelectorAll('.slot')].map((slot) => {
             const box = (slot.firstElementChild || slot).getBoundingClientRect();
             return {

@@ -73,7 +73,7 @@
       "description": "What Spotify or Music is playing, and nothing when neither is",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "tags": [
         "music"
       ],
@@ -84,11 +84,11 @@
       "files": [
         {
           "path": "index.tsx",
-          "bytes": 3700
+          "bytes": 4775
         },
         {
           "path": "preview.jpg",
-          "bytes": 129134
+          "bytes": 129100
         },
         {
           "path": "README.md",
@@ -96,7 +96,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 345
+          "bytes": 353
         }
       ]
     }

@@ -13,18 +13,19 @@
 
 import { styled } from "gailan";
 
-/* Spotify first, then Music, and nothing at all if neither is playing. Each -e is
-   a line of AppleScript, which keeps this to one command. */
+/* Spotify first, then Music, and nothing at all if neither has a track loaded. The
+   player's state comes along so a paused track still shows, quietly. Each -e is a
+   line of AppleScript, which keeps this to one command. */
 export const command = [
   "osascript",
   '-e \'set a to ""\'',
   "-e 'tell application \"System Events\" to set p to name of processes'",
   "-e 'if p contains \"Spotify\" then tell application \"Spotify\" to" +
-    " if player state is playing then set a to (name of current track)" +
-    ' & "|" & (artist of current track)\'',
+    " if player state is not stopped then set a to (name of current track)" +
+    ' & "|" & (artist of current track) & "|" & (player state as string)\'',
   "-e 'if a is \"\" and p contains \"Music\" then tell application \"Music\" to" +
-    " if player state is playing then set a to (name of current track)" +
-    ' & "|" & (artist of current track)\'',
+    " if player state is not stopped then set a to (name of current track)" +
+    ' & "|" & (artist of current track) & "|" & (player state as string)\'',
   "-e 'return a'",
 ].join(" ");
 
@@ -41,11 +42,16 @@ const Panel = styled("div")`
   --dim: rgba(244, 244, 242, 0.42);
   --rule: rgba(244, 244, 242, 0.16);
   --red: #d71921;
+  /* the lamp beats between these two while a track runs */
+  --red-dark: #7c0d13;
+  /* and sits at this one when it does not, which reads as off without going out */
+  --red-pale: #f2868b;
 
   @media (prefers-color-scheme: light) {
     --ink: #0b0b0c;
     --dim: rgba(11, 11, 12, 0.45);
     --rule: rgba(11, 11, 12, 0.18);
+    --red-pale: #e8a0a4;
   }
 
   position: relative;
@@ -79,11 +85,36 @@ const Mark = styled("div")`
   color: var(--dim);
 `;
 
+/* A lamp rather than an ornament: beating while a track runs, pale while it is
+   held. Anyone who would rather it sat still can say so, and the system is asked
+   before it beats at all. */
 const Dot = styled("div")`
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--red-pale);
+
+  @keyframes gailan-now-playing-beat {
+    0%,
+    100% {
+      background: var(--red);
+    }
+    50% {
+      background: var(--red-dark);
+    }
+  }
+
+  &[data-playing="true"] {
+    background: var(--red);
+    animation: gailan-now-playing-beat 1.3s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &[data-playing="true"] {
+      animation: none;
+      background: var(--red);
+    }
+  }
 `;
 
 const Title = styled("div")`
@@ -127,7 +158,8 @@ export const render = ({ output, error }: State) => {
     );
   }
 
-  const [title, artist] = output.trim().split("|");
+  const [title, artist, state] = output.trim().split("|");
+  const playing = state === "playing";
 
   if (!title) {
     return (
@@ -143,8 +175,8 @@ export const render = ({ output, error }: State) => {
   return (
     <Panel>
       <Marks>
-        <Mark>now playing</Mark>
-        <Dot />
+        <Mark>{playing ? "now playing" : "paused"}</Mark>
+        <Dot data-playing={playing} />
       </Marks>
       <Title>{title}</Title>
       <Artist>{artist || "unknown"}</Artist>
