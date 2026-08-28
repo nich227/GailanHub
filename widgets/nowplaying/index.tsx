@@ -22,7 +22,10 @@ export const command = [
   "-e 'tell application \"System Events\" to set p to name of processes'",
   "-e 'if p contains \"Spotify\" then tell application \"Spotify\" to" +
     " if player state is not stopped then set a to (name of current track)" +
-    ' & "|" & (artist of current track) & "|" & (player state as string)\'',
+    ' & "|" & (artist of current track) & "|" & (player state as string)' +
+    ' & "|" & (artwork url of current track)\'',
+  // Music holds artwork as data rather than at a url, so there is nothing to point
+  // at and the cover is left empty there
   "-e 'if a is \"\" and p contains \"Music\" then tell application \"Music\" to" +
     " if player state is not stopped then set a to (name of current track)" +
     ' & "|" & (artist of current track) & "|" & (player state as string)\'',
@@ -117,6 +120,40 @@ const Dot = styled("div")`
   }
 `;
 
+/* The one thing here that is not monochrome. Album art is what the widget is about,
+   so it is shown as it is rather than made to match the case around it. */
+const Cover = styled("img")`
+  display: block;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--rule);
+`;
+
+/* Nothing to show, but the row should not jump when there is: a player with no
+   artwork leaves the same square empty. */
+const NoCover = styled("div")`
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+`;
+
+const Track = styled("div")`
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-width: 0;
+`;
+
+const Words = styled("div")`
+  min-width: 0;
+`;
+
 const Title = styled("div")`
   font-size: 15px;
   line-height: 1.25;
@@ -158,7 +195,8 @@ export const render = ({ output, error }: State) => {
     );
   }
 
-  const [title, artist, state] = output.trim().split("|");
+  // artwork urls carry no pipe, so splitting on it is safe
+  const [title, artist, state, artwork] = output.trim().split("|");
   const playing = state === "playing";
 
   if (!title) {
@@ -178,8 +216,17 @@ export const render = ({ output, error }: State) => {
         <Mark>{playing ? "now playing" : "paused"}</Mark>
         <Dot data-playing={playing} />
       </Marks>
-      <Title>{title}</Title>
-      <Artist>{artist || "unknown"}</Artist>
+      <Track>
+        {artwork ? (
+          <Cover src={artwork} alt={`Cover of ${title}`} />
+        ) : (
+          <NoCover aria-hidden="true" />
+        )}
+        <Words>
+          <Title>{title}</Title>
+          <Artist>{artist || "unknown"}</Artist>
+        </Words>
+      </Track>
     </Panel>
   );
 };

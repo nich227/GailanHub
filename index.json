@@ -74,10 +74,10 @@
     {
       "name": "nowplaying",
       "title": "Now Playing",
-      "description": "What Spotify or Music is playing, and nothing when neither is",
+      "description": "What Spotify or Music is playing, with the cover, and nothing when neither is",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "tags": [
         "music"
       ],
@@ -88,19 +88,23 @@
       "files": [
         {
           "path": "index.tsx",
-          "bytes": 4775
+          "bytes": 6017
         },
         {
           "path": "preview.jpg",
-          "bytes": 129100
+          "bytes": 133158
         },
         {
           "path": "README.md",
-          "bytes": 449
+          "bytes": 1151
+        },
+        {
+          "path": "sample-cover.jpg",
+          "bytes": 7850
         },
         {
           "path": "widget.json",
-          "bytes": 353
+          "bytes": 386
         }
       ]
     }

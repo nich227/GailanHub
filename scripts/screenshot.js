@@ -369,6 +369,7 @@ function electron() {
 function report(measured) {
   const [width, height] = measured.desktop;
   (measured.fonts || []).forEach((font) => console.log(`  font: ${font}`));
+  (measured.images || []).forEach((image) => console.log(`  image: ${image}`));
   (measured.animations || []).forEach((animation) =>
     console.log(`  moving: ${animation}`)
   );
@@ -416,6 +417,13 @@ function capture(binary, url, done) {
           // a widget may ship a typeface, and a fallback looks fine until you
           // compare it to the real thing
           fonts: [...document.fonts].map((f) => f.family + ' ' + f.status),
+          // an image that did not arrive leaves a gap the capture will happily keep
+          images: [...document.querySelectorAll('.slot img')].map(
+            (img) =>
+              (img.naturalWidth ? 'loaded' : 'MISSING') +
+              ' ' +
+              img.src.split('/').pop().slice(0, 44)
+          ),
           // anything set to move, so a widget that should beat can be seen to
           animations: [...document.querySelectorAll('.slot *')]
             .map((el) => getComputedStyle(el))
