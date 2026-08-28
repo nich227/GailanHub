@@ -10,8 +10,11 @@
 
 import { styled } from "gailan";
 
-/* One command, four fields. The separator saves running `date` four times. */
-export const command = "date '+%H:%M|%S|%a %d %b|%j'";
+/* The machine is asked what time it is, once, and everything shown is worked out from
+   that: the two clock forms, the date, and how far through the year it is. Asking `date`
+   to format six fields meant the command had to change whenever the display did, and it
+   still could not tell a leap year from an ordinary one. */
+export const command = "date +%s";
 
 /* Seconds are shown on both faces, so this has to tick like one. */
 export const refreshFrequency = 1000;
@@ -118,6 +121,14 @@ const Time = styled("div")`
   font-variant-numeric: tabular-nums;
 `;
 
+/* Small, and not red: the seconds are the thing moving, and am or pm is not. */
+const Meridiem = styled("div")`
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--dim);
+`;
+
 const Seconds = styled("div")`
   font-family: "Gailan Dot Matrix", "SF Mono", ui-monospace, Menlo, monospace;
   font-size: 13px;
@@ -184,15 +195,32 @@ const Footer = styled("div")`
   color: var(--dim);
 `;
 
-const CENTRE = 50;
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/* A year is 366 days one in four, which the old hardcoded 365 could not say. */
+const daysInYear = (year: number) =>
+  (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 366 : 365;
+
+const dayOfYear = (at: Date) => {
+  const start = new Date(at.getFullYear(), 0, 0);
+  return Math.floor((at.getTime() - start.getTime()) / 86400000);
+};
+
+const CENTER = 50;
 const RADIUS = 46;
 
 function pointAt(angle: number, length: number) {
   // twelve o'clock is up, and svg's y counts downward
   const radians = ((angle - 90) * Math.PI) / 180;
   return {
-    x: CENTRE + Math.cos(radians) * length,
-    y: CENTRE + Math.sin(radians) * length,
+    x: CENTER + Math.cos(radians) * length,
+    y: CENTER + Math.sin(radians) * length,
   };
 }
 
@@ -214,26 +242,26 @@ function Hands({
     <>
       <line
         className="hand-hour"
-        x1={CENTRE}
-        y1={CENTRE}
+        x1={CENTER}
+        y1={CENTER}
         x2={hour.x}
         y2={hour.y}
       />
       <line
         className="hand-minute"
-        x1={CENTRE}
-        y1={CENTRE}
+        x1={CENTER}
+        y1={CENTER}
         x2={minute.x}
         y2={minute.y}
       />
       <line
         className="hand-second"
-        x1={CENTRE}
-        y1={CENTRE}
+        x1={CENTER}
+        y1={CENTER}
         x2={second.x}
         y2={second.y}
       />
-      <circle className="cap" cx={CENTRE} cy={CENTRE} r={2.5} />
+      <circle className="cap" cx={CENTER} cy={CENTER} r={2.5} />
     </>
   );
 }
@@ -260,7 +288,7 @@ function Ticks() {
   );
 }
 
-type Settings = { face?: string; draggable?: boolean };
+type Settings = { face?: string; hours?: string; draggable?: boolean };
 /* ---------- moving it about ---------- */
 
 /* Gailan puts a widget where its className says. Dragging has to override that, so
@@ -349,10 +377,39 @@ export const render = ({ output, error, settings }: State) => {
     );
   }
 
-  const [time, seconds, date, dayOfYear] = output.trim().split("|");
-  const day = Number(dayOfYear);
+  const at = new Date(Number(output.trim()) * 1000);
+  if (Number.isNaN(at.getTime())) {
+    return (
+      <Panel
+        data-draggable={draggable}
+        ref={place}
+        onMouseDown={draggable ? startDrag : undefined}
+      >
+        <Marks>
+          <Mark>clock</Mark>
+        </Marks>
+        <Mark>unavailable</Mark>
+      </Panel>
+    );
+  }
+
   const analog = settings?.face === "analog";
-  const [hours, minutes] = (time || "").split(":").map(Number);
+  const twelve = settings?.hours !== "24";
+
+  // the hands are worked out from the twenty-four hour reading whichever face is
+  // showing, since a dial has no use for am and pm
+  const hours = at.getHours();
+  const minutes = at.getMinutes();
+  const seconds = pad(at.getSeconds());
+
+  const shown = twelve
+    ? `${hours % 12 || 12}:${pad(minutes)}`
+    : `${pad(hours)}:${pad(minutes)}`;
+  const meridiem = hours < 12 ? "am" : "pm";
+
+  const date = `${WEEKDAYS[at.getDay()]} ${at.getDate()} ${MONTHS[at.getMonth()]}`;
+  const day = dayOfYear(at);
+  const lengthOfYear = daysInYear(at.getFullYear());
 
   return (
     <Panel
@@ -378,14 +435,17 @@ export const render = ({ output, error, settings }: State) => {
         </Dial>
       ) : (
         <Readout>
-          <Time>{time}</Time>
+          <Time>{shown}</Time>
           <Seconds>{seconds}</Seconds>
+          {twelve && meridiem ? <Meridiem>{meridiem}</Meridiem> : null}
         </Readout>
       )}
 
       <Footer>
         <span>{date}</span>
-        <span>{String(day).padStart(3, "0")}/365</span>
+        <span>
+          {String(day).padStart(3, "0")}/{lengthOfYear}
+        </span>
       </Footer>
     </Panel>
   );

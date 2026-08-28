@@ -13,7 +13,7 @@ empty there. It is the one thing in the widget that is not monochrome: album art
 you are looking at, so it is shown as it is rather than made to match the case.
 
 The lamp beside the heading says which of three things is true. A track running: dark
-red, beating. A track held: a lighter red, still. Nothing loaded at all: grey, light
+red, beating. A track held: a lighter red, still. Nothing loaded at all: gray, light
 against the dark panel and dark against the light one, because there is nothing to be red
 about. If you have asked your machine for less movement, the dark red stays steady.
 
@@ -35,5 +35,5 @@ The middle one shows two bars while a track runs and a triangle while it is held
 
 ## Settings
 
-- **Drag to move** lets you hold the panel and put it where you like. Where you leave it
-  is remembered.
+Drag to move lets you hold the panel and put it where you like. Where you leave it is
+remembered.

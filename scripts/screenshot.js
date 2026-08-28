@@ -58,7 +58,7 @@ function usage(message) {
   console.error('\nusage: npm run screenshot <widget> [-- options]');
   console.error('  --widgets=a,b,c       several widgets on one desktop');
   console.error('  --fill / --no-fill    scale a lone widget up to fill the frame');
-  console.error('  --position=right|left|centre   overrides the widget\'s own');
+  console.error('  --position=right|left|center   overrides the widget\'s own');
   console.error('  --theme=light|dark    which appearance to render');
   console.error('  --output=<text>       stand in for the command output');
   console.error('  --outputs=<json>      per widget, as {"memory": "45"}');
@@ -418,7 +418,7 @@ function capture(binary, url, done) {
           // a widget may ship a typeface, and a fallback looks fine until you
           // compare it to the real thing
           fonts: [...document.fonts].map((f) => f.family + ' ' + f.status),
-          // anything a widget marks with a state, and the colour it ended up: a
+          // anything a widget marks with a state, and the color it ended up: a
           // lamp meant to change with what it reports is worth checking
           states: [...document.querySelectorAll('.slot [data-state]')].map(
             (el) =>
@@ -442,7 +442,7 @@ function capture(binary, url, done) {
             const box = slot.getBoundingClientRect();
             return {
               // innerText, so a font-face rule is not mistaken for the readout
-              text: (slot.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 30),
+              text: (slot.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 48),
               lines: slot.querySelectorAll('svg line').length,
               x: Math.round(box.x), y: Math.round(box.y),
               width: Math.round(box.width), height: Math.round(box.height),
@@ -471,7 +471,13 @@ function capture(binary, url, done) {
   const run = spawn(
     binary,
     ['--no-sandbox', `--force-device-scale-factor=${SCALE}`, script],
-    {stdio: ['ignore', 'pipe', 'pipe']}
+    {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      // A widget that works out the time itself reads the machine's timezone, so a
+      // pinned reading would show a different hour on every contributor's screen.
+      // Captures run in UTC, which is the one place everybody agrees on.
+      env: {...process.env, TZ: 'UTC'},
+    }
   );
 
   let noise = '';

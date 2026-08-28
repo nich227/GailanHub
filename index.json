@@ -7,7 +7,7 @@
       "description": "The time, the date, and how far through the year you are, on a dot matrix or a dial",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.4.0",
+      "version": "1.0.0",
       "tags": [
         "time"
       ],
@@ -34,6 +34,23 @@
           ]
         },
         {
+          "key": "hours",
+          "type": "choice",
+          "label": "Hours",
+          "help": "A twelve hour clock with am and pm, or a twenty-four hour one",
+          "default": "12",
+          "options": [
+            {
+              "value": "12",
+              "label": "12 hour"
+            },
+            {
+              "value": "24",
+              "label": "24 hour"
+            }
+          ]
+        },
+        {
           "key": "draggable",
           "type": "toggle",
           "label": "Drag to move",
@@ -48,19 +65,19 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 13243
+          "bytes": 15172
         },
         {
           "path": "preview.jpg",
-          "bytes": 125766
+          "bytes": 123982
         },
         {
           "path": "README.md",
-          "bytes": 1304
+          "bytes": 1285
         },
         {
           "path": "widget.json",
-          "bytes": 936
+          "bytes": 1284
         }
       ]
     },
@@ -70,7 +87,7 @@
       "description": "How much of your memory is in use, on a scale you can read a value off",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.2.0",
+      "version": "1.0.0",
       "tags": [
         "system"
       ],
@@ -98,7 +115,7 @@
         },
         {
           "path": "README.md",
-          "bytes": 666
+          "bytes": 656
         },
         {
           "path": "widget.json",
@@ -112,7 +129,7 @@
       "description": "What Spotify or Music is playing, with the cover and controls",
       "author": "Kevin Chen",
       "license": "MIT",
-      "version": "1.6.0",
+      "version": "1.0.0",
       "tags": [
         "music"
       ],
@@ -132,7 +149,7 @@
       "files": [
         {
           "path": "index.tsx",
-          "bytes": 12673
+          "bytes": 12690
         },
         {
           "path": "preview.jpg",
@@ -140,7 +157,7 @@
         },
         {
           "path": "README.md",
-          "bytes": 1829
+          "bytes": 1821
         },
         {
           "path": "sample-cover.jpg",

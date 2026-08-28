@@ -49,20 +49,20 @@ so add that file to your `.gitignore` rather than committing your own choices.
 
 ## What review looks at
 
-- **It compiles.** CI runs esbuild over the entry file, the same bundler Gailan
+- It compiles. CI runs esbuild over the entry file, the same bundler Gailan
   uses. Types are stripped, not checked, so a type error will not fail the build,
   but a syntax error will.
-- **It says what it runs.** A widget that shells out should say so in its README,
+- It says what it runs. A widget that shells out should say so in its README,
   including anything it expects to be installed. `brew install`-and-hope is fine
   as long as it is written down.
-- **It fetches from where it says.** Network calls belong in the README too, with
-  the endpoint. A widget that quietly phones somewhere will be sent back.
-- **No secrets.** No API keys, tokens, or personal paths in the source. Read them
+- It fetches from where it says. Network calls belong in the README too, with
+  the endpoint. A widget that phones somewhere it did not mention will be sent back.
+- No secrets. No API keys, tokens, or personal paths in the source. Read them
   from the environment or a file the user creates, and document that.
-- **It behaves on a desktop.** No fixed pixel sizes that assume your display, no
+- It behaves on a desktop. No fixed pixel sizes that assume your display, no
   `position: fixed` covering the screen, no polling every 100ms. `refreshFrequency`
   should be the longest interval that still makes the widget useful.
-- **It is yours to give.** Only submit code you wrote or can relicense.
+- It is yours to give. Only submit code you wrote or can relicense.
 
 ## Writing the widget
 

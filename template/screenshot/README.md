@@ -25,7 +25,7 @@ Your widget renders with real output, because the command really runs. If your
 `--output` instead.
 
 Better still, pin it. A `screenshotOutput` in your `widget.json` is what the preview
-renders with, so regenerating it does not quietly change the picture, and a widget
+renders with, so regenerating it cannot change the picture behind your back, and a widget
 whose reading depends on the machine still looks right on someone else's:
 
 ```json
@@ -33,17 +33,19 @@ whose reading depends on the machine still looks right on someone else's:
 ```
 
 The clock uses 09:41 because that is the time on the menu bar in the frame, and on
-every screenshot Apple has ever published.
+every screenshot Apple has ever published. Its pinned value is a unix timestamp, and
+captures run with `TZ=UTC` so a widget that works out the time itself shows the same hour
+on everyone's machine.
 
 ## Options
 
 ```
-npm run screenshot clock -- --position=centre --theme=dark
+npm run screenshot clock -- --position=center --theme=dark
 ```
 
 | Option | What it does |
 |---|---|
-| `--position=right\|left\|centre` | Overrides the placement in your `className` |
+| `--position=right\|left\|center` | Overrides the placement in your `className` |
 | `--theme=light\|dark` | Which appearance to render, since widgets answer `prefers-color-scheme` |
 | `--output=<text>` | Stands in for the command output |
 | `--settings=<json>` | Renders with particular settings |
@@ -65,7 +67,7 @@ Cmd-Shift-4 with the pointer snapped to the window does this.
 
 ## What is in the frame
 
-The menu bar and the dock are drawn, not Apple's artwork: the dock holds coloured
+The menu bar and the dock are drawn, not Apple's artwork: the dock holds colored
 shapes rather than app icons. The wallpaper is fetched when you run the script and is
 never committed, since it is not ours to redistribute. Point `--wallpaper` at
 something else and nothing about the frame changes.

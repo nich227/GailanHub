@@ -4,7 +4,7 @@
   "description": "What Spotify or Music is playing, with the cover and controls",
   "author": "Kevin Chen",
   "license": "MIT",
-  "version": "1.6.0",
+  "version": "1.0.0",
   "entry": "index.tsx",
   "tags": [
     "music"

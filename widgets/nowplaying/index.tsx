@@ -14,8 +14,8 @@
 import { run, styled } from "gailan";
 
 /* Spotify first, then Music, and nothing at all if neither has a track loaded. The
-   player's state comes along so a paused track still shows, quietly. Each -e is a
-   line of AppleScript, which keeps this to one command. */
+   player's state comes along so a paused track still shows, without its lamp beating.
+   Each -e is a line of AppleScript, which keeps this to one command. */
 export const command = [
   "osascript",
   '-e \'set a to ""\'',
@@ -49,7 +49,7 @@ const Panel = styled("div")`
   --red-dark: #7c0d13;
   /* and sits at this one when a track is held rather than running */
   --red-pale: #f2868b;
-  /* with nothing loaded there is nothing to be red about, so it goes grey: light
+  /* with nothing loaded there is nothing to be red about, so it goes gray: light
      against a dark panel, dark against a light one */
   --lamp-idle: #9b9b96;
 

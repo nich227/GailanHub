@@ -4,13 +4,13 @@
   "description": "The time, the date, and how far through the year you are, on a dot matrix or a dial",
   "author": "Kevin Chen",
   "license": "MIT",
-  "version": "1.4.0",
+  "version": "1.0.0",
   "entry": "index.tsx",
   "tags": [
     "time"
   ],
   "minimumGailanVersion": "1.0.0",
-  "screenshotOutput": "09:41|00|Thu 27 Aug|239",
+  "screenshotOutput": "1787823660",
   "settings": [
     {
       "key": "face",
@@ -26,6 +26,23 @@
         {
           "value": "analog",
           "label": "Analog"
+        }
+      ]
+    },
+    {
+      "key": "hours",
+      "type": "choice",
+      "label": "Hours",
+      "help": "A twelve hour clock with am and pm, or a twenty-four hour one",
+      "default": "12",
+      "options": [
+        {
+          "value": "12",
+          "label": "12 hour"
+        },
+        {
+          "value": "24",
+          "label": "24 hour"
         }
       ]
     },
