@@ -8,7 +8,11 @@
  * Copyright (c) 2026 Kevin Chen. MIT licensed.
  */
 
-import { styled } from "gailan";
+// React comes along because the dial groups its marks and hands in fragments, and a
+// fragment compiles to React.Fragment. Without it the analog face threw on every
+// render and drew nothing at all, while the numerals, which use no fragments, were
+// perfectly happy.
+import { React, styled } from "gailan";
 
 /* The machine is asked what time it is, once, and everything shown is worked out from
    that: the two clock forms, the date, and how far through the year it is. Asking `date`
