@@ -115,16 +115,6 @@ const Dot = styled("div")`
   border-radius: 50%;
   background: var(--lamp-idle);
 
-  @keyframes gailan-now-playing-beat {
-    0%,
-    100% {
-      background: var(--red-dark);
-    }
-    50% {
-      background: var(--red);
-    }
-  }
-
   &[data-state="playing"] {
     background: var(--red-dark);
     animation: gailan-now-playing-beat 1.3s ease-in-out infinite;
@@ -405,6 +395,18 @@ const startDrag = (event: any) => {
   document.addEventListener("mouseup", onUp);
 };
 
+/* The keyframes go in a style element rather than inside the styled component.
+   Emotion serialises a component's css the first time it renders, and an at-rule in
+   there took the whole widget down with it: the panel drew nothing at all. */
+const Beat = () => (
+  <style>{`
+    @keyframes gailan-now-playing-beat {
+      0%, 100% { background: var(--red-dark); }
+      50% { background: var(--red); }
+    }
+  `}</style>
+);
+
 type Settings = { draggable?: boolean };
 type State = { output: string; error?: string; settings?: Settings };
 
@@ -417,6 +419,7 @@ export const render = ({ output, error, settings }: State) => {
         ref={place}
         onMouseDown={draggable ? startDrag : undefined}
       >
+        <Beat />
         <Marks>
           <Mark>now playing</Mark>
           <Dot data-state="idle" />
@@ -437,6 +440,7 @@ export const render = ({ output, error, settings }: State) => {
         ref={place}
         onMouseDown={draggable ? startDrag : undefined}
       >
+        <Beat />
         <Marks>
           <Mark>now playing</Mark>
           <Dot data-state="idle" />
@@ -452,6 +456,7 @@ export const render = ({ output, error, settings }: State) => {
       ref={place}
       onMouseDown={draggable ? startDrag : undefined}
     >
+      <Beat />
       <Marks>
         <Mark>{playing ? "now playing" : "paused"}</Mark>
         <Dot data-state={playing ? "playing" : "paused"} />
