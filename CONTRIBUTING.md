@@ -16,6 +16,7 @@ trip.
 | `author` | your name, or a handle |
 | `license` | an SPDX identifier such as `MIT` or `GPL-3.0` |
 | `version` | `x.y.z` |
+| `screenshotOutput` | optional: what the preview renders with, so it stays put |
 | `entry` | the widget file, `.tsx` `.jsx` `.ts` or `.js` |
 
 Optional: `tags` (an array of lowercase words), `homepage`, `minimumGailanVersion`,

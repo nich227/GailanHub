@@ -6,6 +6,9 @@
   "license": "MIT",
   "version": "1.0.0",
   "entry": "index.tsx",
-  "tags": ["time"],
-  "minimumGailanVersion": "1.0.0"
+  "tags": [
+    "time"
+  ],
+  "minimumGailanVersion": "1.0.0",
+  "screenshotOutput": "09:41|00|Thu 27 Aug|239"
 }

@@ -22,7 +22,7 @@
         },
         {
           "path": "preview.jpg",
-          "bytes": 131069
+          "bytes": 132629
         },
         {
           "path": "README.md",
@@ -30,7 +30,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 266
+          "bytes": 323
         }
       ]
     },
@@ -63,7 +63,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 284
+          "bytes": 320
         }
       ]
     },
@@ -96,7 +96,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 283
+          "bytes": 345
         }
       ]
     }

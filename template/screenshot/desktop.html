@@ -235,6 +235,14 @@
       const wallpaper = query.get("wallpaper") || "wallpaper.jpg";
       const position = query.get("position");
       const fill = query.get("fill") === "1";
+      const arrange = query.get("arrange") || "";
+      const zoom = Number(query.get("zoom") || "1") || 1;
+
+      // clear of the menu bar, clear of the dock, and the same gap between each
+      const BAR = 25;
+      const DOCK = 82;
+      const INSET = 34;
+      const GAP = 26;
       const app = query.get("app");
       const clock = query.get("clock");
 
@@ -306,6 +314,36 @@
         );
       });
 
+      // Several widgets read as a desktop, and a desktop wants them tidy: down the
+      // right, the same distance apart, clear of the bar above and the dock below.
+      // Measuring first is what makes the gaps even when the panels differ in
+      // height, and scaling by transform keeps that arithmetic in one place.
+      if (arrange === "right" && slots.length) {
+        setTimeout(() => {
+          let top = BAR + INSET;
+
+          slots.forEach((slot) => {
+            const drawn = slot.firstElementChild || slot;
+            const box = drawn.getBoundingClientRect();
+
+            slot.style.cssText =
+              "position: absolute;" +
+              "width: fit-content; height: fit-content;" +
+              "right: " + INSET + "px;" +
+              "top: " + Math.round(top) + "px;" +
+              "transform: scale(" + zoom + ");" +
+              "transform-origin: top right;";
+
+            top += box.height * zoom + GAP;
+          });
+
+          const overflow = top - GAP - (desktop.clientHeight - DOCK);
+          if (overflow > 0) {
+            console.warn("the column is " + Math.round(overflow) + "px too tall");
+          }
+        }, 700);
+      }
+
       // A lone widget is a portrait of that widget, so it is scaled up until it
       // nearly fills the frame. Waiting a beat lets it render first: there is
       // nothing to measure before that.
@@ -317,11 +355,9 @@
           const box = drawn.getBoundingClientRect();
           if (!box.width || !box.height) return;
 
-          const bar = 25;
-          const dock = 82;
           const room = {
             width: desktop.clientWidth * 0.78,
-            height: (desktop.clientHeight - bar - dock) * 0.86,
+            height: (desktop.clientHeight - BAR - DOCK) * 0.86,
           };
           const scale = Math.min(room.width / box.width, room.height / box.height);
           if (scale <= 1) return;
@@ -330,7 +366,7 @@
             "position: absolute;" +
             "width: fit-content; height: fit-content;" +
             "left: 50%;" +
-            "top: " + (bar + (desktop.clientHeight - bar - dock) / 2) + "px;" +
+            "top: " + (BAR + (desktop.clientHeight - BAR - DOCK) / 2) + "px;" +
             "transform: translate(-50%, -50%) scale(" + scale.toFixed(3) + ");";
         }, 700);
       }

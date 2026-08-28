@@ -24,6 +24,17 @@ Your widget renders with real output, because the command really runs. If your
 `command` is a function rather than a string it cannot be run this way, so pass
 `--output` instead.
 
+Better still, pin it. A `screenshotOutput` in your `widget.json` is what the preview
+renders with, so regenerating it does not quietly change the picture, and a widget
+whose reading depends on the machine still looks right on someone else's:
+
+```json
+{ "screenshotOutput": "09:41|00|Thu 27 Aug|239" }
+```
+
+The clock uses 09:41 because that is the time on the menu bar in the frame, and on
+every screenshot Apple has ever published.
+
 ## Options
 
 ```
@@ -36,11 +47,14 @@ npm run screenshot clock -- --position=centre --theme=dark
 | `--theme=light\|dark` | Which appearance to render, since widgets answer `prefers-color-scheme` |
 | `--output=<text>` | Stands in for the command output |
 | `--settings=<json>` | Renders with particular settings |
+| `--arrange=right\|own` | Down the right evenly, or where each widget says |
+| `--zoom=<n>` | Scale the widgets in the frame |
 | `--wallpaper=<path>` | An image of your own |
 | `--out=<path>` | Somewhere else to write it |
 
-By default the widget sits where your `className` says, so the preview shows the
-placement you chose.
+One widget sits where your `className` says and is scaled up to fill the frame. Several
+are arranged down the right, evenly spaced and slightly enlarged, since that reads as a
+desktop rather than a pile.
 
 ## Without Electron
 

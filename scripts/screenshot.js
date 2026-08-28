@@ -62,6 +62,8 @@ function usage(message) {
   console.error('  --theme=light|dark    which appearance to render');
   console.error('  --output=<text>       stand in for the command output');
   console.error('  --outputs=<json>      per widget, as {"memory": "45"}');
+  console.error('  --arrange=right|own   down the right, or where each says');
+  console.error('  --zoom=<n>            scale the widgets in the frame');
   console.error('  --settings=<json>     settings to render with');
   console.error('  --wallpaper=<path>    an image of your own');
   console.error('  --assets=<dir>        more files the widgets load');
@@ -132,6 +134,10 @@ const out = path.resolve(
 
 const position = option('position', '');
 const theme = option('theme', 'light');
+// several widgets are a desktop, and a desktop reads better tidy: down the right,
+// evenly spaced, and a little larger than life so they can be seen
+const arrange = option('arrange', single ? 'own' : 'right');
+const zoom = option('zoom', single ? '1' : '1.25');
 
 function defaultSettings(manifest) {
   const values = {};
@@ -490,10 +496,13 @@ try {
 Promise.all(
   widgets.map((widget) =>
     readExports(widget, work).then((exports) => {
+      const pinned = widget.manifest.screenshotOutput;
       const output =
         overrides[widget.id] !== undefined
           ? overrides[widget.id]
-          : option('output', runCommand(exports.command));
+          : pinned !== undefined
+            ? pinned
+            : option('output', runCommand(exports.command));
 
       return buildWidget(widget, work).then(() => ({
         id: widget.id,
@@ -519,6 +528,8 @@ function start(mounted) {
       `?widgets=${encodeURIComponent(JSON.stringify(mounted))}` +
       `&position=${encodeURIComponent(position)}` +
       `&fill=${fill ? '1' : '0'}` +
+      `&arrange=${encodeURIComponent(arrange === 'own' ? '' : arrange)}` +
+      `&zoom=${encodeURIComponent(zoom)}` +
       (framed ? '' : '&wallpaper=');
 
     const url = `http://127.0.0.1:${port}/index.html${query}`;

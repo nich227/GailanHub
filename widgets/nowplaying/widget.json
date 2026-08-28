@@ -6,6 +6,9 @@
   "license": "MIT",
   "version": "1.0.0",
   "entry": "index.tsx",
-  "tags": ["music"],
-  "minimumGailanVersion": "1.0.0"
+  "tags": [
+    "music"
+  ],
+  "minimumGailanVersion": "1.0.0",
+  "screenshotOutput": "Human Nature|Michael Jackson"
 }
