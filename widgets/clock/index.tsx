@@ -171,10 +171,40 @@ const Dial = styled("svg")`
     stroke-width: 2.5;
   }
 
+  /* The Swiss railway hand does not tick and does not quite sweep either: it goes
+     round in 58.5 seconds and then waits at the top for the minute pulse. That is
+     the whole character of the thing, so the keyframes hold at 360 for the last
+     1.5 seconds rather than easing all the way round.
+
+     The rotation is CSS rather than arithmetic because the widget only hears from
+     the machine once a second, which is a tick however smoothly it is drawn. */
+  @keyframes gailan-clock-sweep {
+    0% {
+      transform: rotate(0deg);
+    }
+    97.5% {
+      transform: rotate(360deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
   .hand-second {
     stroke: var(--red);
     stroke-width: 1;
     stroke-linecap: round;
+    transform-box: view-box;
+    transform-origin: 50px 50px;
+    animation: gailan-clock-sweep 60s linear infinite;
+  }
+
+  /* asked for less movement: the hand steps once a second, from the transform the
+     render puts on it, which the animation was overriding */
+  @media (prefers-reduced-motion: reduce) {
+    .hand-second {
+      animation: none;
+    }
   }
 
   .cap {
@@ -224,6 +254,18 @@ function pointAt(angle: number, length: number) {
   };
 }
 
+/* Starts the sweep where the minute already is, and only once: setting the delay on
+   every render would restart the animation each second, which is the stutter this is
+   here to avoid. */
+const startSweep = (el: SVGLineElement | null) => {
+  if (!el || el.dataset.sweeping === "yes") return;
+  el.dataset.sweeping = "yes";
+
+  const at = new Date();
+  const into = at.getSeconds() + at.getMilliseconds() / 1000;
+  el.style.animationDelay = `-${into.toFixed(3)}s`;
+};
+
 function Hands({
   hours,
   minutes,
@@ -236,7 +278,9 @@ function Hands({
   // the hour hand moves through the hour rather than jumping at the top of it
   const hour = pointAt(((hours % 12) + minutes / 60) * 30, 24);
   const minute = pointAt((minutes + seconds / 60) * 6, 34);
-  const second = pointAt(seconds * 6, 38);
+  // straight up, and turned by the animation. The inline rotation is what shows when
+  // movement is turned off, since an animation outranks it while it is running.
+  const second = pointAt(0, 38);
 
   return (
     <>
@@ -256,6 +300,8 @@ function Hands({
       />
       <line
         className="hand-second"
+        ref={startSweep}
+        style={{transform: `rotate(${seconds * 6}deg)`}}
         x1={CENTER}
         y1={CENTER}
         x2={second.x}
@@ -425,7 +471,7 @@ export const render = ({ output, error, settings }: State) => {
       </Marks>
 
       {analog ? (
-        <Dial viewBox="0 0 100 100" role="img" aria-label={`${time}:${seconds}`}>
+        <Dial viewBox="0 0 100 100" role="img" aria-label={`${shown} ${seconds}`}>
           <Ticks />
           <Hands
             hours={hours || 0}
