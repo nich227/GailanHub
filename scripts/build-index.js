@@ -70,6 +70,9 @@ const widgets = fs
       path: `widgets/${name}`,
       screenshot: `widgets/${name}/${manifest.screenshot || previewFor(name)}`,
       entry: manifest.entry,
+      // what the widget lets you change, so the gallery can say so without
+      // downloading it first
+      settings: manifest.settings || [],
       files: filesIn(path.join(widgetsDir, name)),
     };
   });

@@ -15,6 +15,32 @@
       "path": "widgets/clock",
       "screenshot": "widgets/clock/preview.jpg",
       "entry": "index.tsx",
+      "settings": [
+        {
+          "key": "face",
+          "type": "choice",
+          "label": "Face",
+          "help": "Numerals on a dot matrix, or hands on a dial",
+          "default": "digital",
+          "options": [
+            {
+              "value": "digital",
+              "label": "Digital"
+            },
+            {
+              "value": "analog",
+              "label": "Analog"
+            }
+          ]
+        },
+        {
+          "key": "draggable",
+          "type": "toggle",
+          "label": "Drag to move",
+          "help": "Hold and drag the widget to place it. Needs interaction turned on in Gailan.",
+          "default": false
+        }
+      ],
       "files": [
         {
           "path": "dotmatrix-OFL.txt",
@@ -52,6 +78,15 @@
       "path": "widgets/memory",
       "screenshot": "widgets/memory/preview.jpg",
       "entry": "index.tsx",
+      "settings": [
+        {
+          "key": "draggable",
+          "type": "toggle",
+          "label": "Drag to move",
+          "help": "Hold and drag the widget to place it. Needs interaction turned on in Gailan.",
+          "default": false
+        }
+      ],
       "files": [
         {
           "path": "index.tsx",
@@ -85,6 +120,15 @@
       "path": "widgets/nowplaying",
       "screenshot": "widgets/nowplaying/preview.jpg",
       "entry": "index.tsx",
+      "settings": [
+        {
+          "key": "draggable",
+          "type": "toggle",
+          "label": "Drag to move",
+          "help": "Hold and drag the widget to place it. Needs interaction turned on in Gailan.",
+          "default": false
+        }
+      ],
       "files": [
         {
           "path": "index.tsx",
