@@ -30,7 +30,7 @@ widgets/clock/
   widget.json      the manifest CI reads, and any settings the widget offers
   index.tsx        the widget itself
   README.md        what it does, and anything it needs
-  preview.png      a screenshot, 2x, cropped to the widget
+  preview.jpg      a screenshot on a desktop, from npm run screenshot
 ```
 
 The folder name is the widget's id, so `widgets/clock/index.tsx` appears in Gailan

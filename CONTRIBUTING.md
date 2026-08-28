@@ -19,7 +19,7 @@ trip.
 | `entry` | the widget file, `.tsx` `.jsx` `.ts` or `.js` |
 
 Optional: `tags` (an array of lowercase words), `homepage`, `minimumGailanVersion`,
-`screenshot` (defaults to `preview.png`).
+`screenshot` (otherwise `preview.jpg`, `preview.jpeg` or `preview.png`, whichever is there).
 
 ## Settings a widget offers
 
@@ -101,7 +101,12 @@ as you like.
 - Bump `version` in every pull request that changes a widget's files. Gailan
   compares the installed version against this index to decide what to offer as an
   update, so a change that ships without a bump never reaches anyone.
-- Screenshots go in the folder as `preview.png`, not pasted into the description.
+- Take the screenshot with `npm run screenshot <widget>`, which frames your widget on
+  a Mac desktop the way every other preview is framed. It writes `preview.jpg` into
+  your widget's folder. See [the template](template/screenshot/README.md) for the
+  options, including where the widget sits and which appearance to render. A
+  screenshot pasted into the pull request description is not a substitute: the gallery
+  reads the file.
   Crop to the widget, take it at 2x, and keep it under 500KB.
 
 If CI fails and the message is not clear, say so in the pull request rather than

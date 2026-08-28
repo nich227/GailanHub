@@ -25,6 +25,16 @@ const widgetsDir = path.join(root, 'widgets');
 // file. GitHub serves whole repositories as archives but never a single folder, and
 // walking the tree over the API costs a request and counts against a rate limit.
 // A user's own settings.json is not part of the widget.
+// a screenshot of a desktop is a photograph, so most widgets ship a jpeg, but a
+// widget that would rather ship a png is not made to change
+function previewFor(name) {
+  const candidates = ['preview.jpg', 'preview.jpeg', 'preview.png'];
+  const found = candidates.find((file) =>
+    fs.existsSync(path.join(widgetsDir, name, file))
+  );
+  return found || 'preview.png';
+}
+
 function filesIn(dir, prefix = '') {
   return fs
     .readdirSync(dir, {withFileTypes: true})
@@ -58,7 +68,7 @@ const widgets = fs
       tags: manifest.tags || [],
       homepage: manifest.homepage || null,
       path: `widgets/${name}`,
-      screenshot: `widgets/${name}/${manifest.screenshot || 'preview.png'}`,
+      screenshot: `widgets/${name}/${manifest.screenshot || previewFor(name)}`,
       entry: manifest.entry,
       files: filesIn(path.join(widgetsDir, name)),
     };

@@ -13,7 +13,7 @@
       ],
       "homepage": null,
       "path": "widgets/clock",
-      "screenshot": "widgets/clock/preview.png",
+      "screenshot": "widgets/clock/preview.jpg",
       "entry": "index.tsx",
       "files": [
         {
@@ -21,8 +21,8 @@
           "bytes": 3319
         },
         {
-          "path": "preview.png",
-          "bytes": 108264
+          "path": "preview.jpg",
+          "bytes": 133115
         },
         {
           "path": "README.md",

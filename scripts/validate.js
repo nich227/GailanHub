@@ -109,9 +109,17 @@ function checkFiles(dir, manifest, widget) {
     fail(widget, 'has no README.md saying what it does');
   }
 
-  const screenshot = path.join(dir, manifest.screenshot || 'preview.png');
-  if (!fs.existsSync(screenshot)) {
-    fail(widget, `has no screenshot at ${path.basename(screenshot)}`);
+  // a screenshot of a desktop is a photograph, so preview.jpg is the usual answer,
+  // and a widget that would rather ship a png is not made to change
+  const named = manifest.screenshot
+    ? [manifest.screenshot]
+    : ['preview.jpg', 'preview.jpeg', 'preview.png'];
+  const screenshot = named
+    .map((file) => path.join(dir, file))
+    .find((file) => fs.existsSync(file));
+
+  if (!screenshot) {
+    fail(widget, `has no screenshot at ${named.join(' or ')}`);
   } else if (fs.statSync(screenshot).size > MAX_SCREENSHOT_BYTES) {
     fail(widget, 'screenshot is over 500KB');
   }

@@ -5,9 +5,15 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "validate": "node scripts/validate.js",
-    "index": "node scripts/build-index.js"
+    "index": "node scripts/build-index.js",
+    "screenshot": "node scripts/screenshot.js"
   },
   "devDependencies": {
-    "esbuild": "0.25.10"
+    "esbuild": "0.25.10",
+    "@emotion/css": "^11.13.5",
+    "@emotion/styled": "^11.14.1",
+    "@emotion/react": "^11.14.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   }
 }

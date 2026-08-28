@@ -2,3 +2,4 @@ node_modules/
 
 # what Gailan writes for a user own settings, not ours to commit
 widgets/*/settings.json
+.screenshot-cache/
