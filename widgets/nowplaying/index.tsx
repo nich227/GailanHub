@@ -627,6 +627,11 @@ export const render = ({ output, error, settings }: State) => {
   if (error) {
     return (
       <Panel
+        /* Gailan asks macOS for frosted wallpaper behind exactly this rectangle. The
+         corner is left for Gailan to read off the panel, so it cannot be written here
+         as one number and in the stylesheet as another. */
+        id="gailan-nowplaying"
+        data-gailan-desktop-glass=""
         data-draggable={draggable}
         data-background={surface}
         style={{ ["--accent" as string]: accent }}
@@ -662,6 +667,11 @@ export const render = ({ output, error, settings }: State) => {
   if (!title) {
     return (
       <Panel
+        /* Gailan asks macOS for frosted wallpaper behind exactly this rectangle. The
+         corner is left for Gailan to read off the panel, so it cannot be written here
+         as one number and in the stylesheet as another. */
+        id="gailan-nowplaying"
+        data-gailan-desktop-glass=""
         data-draggable={draggable}
         data-background={surface}
         style={{ ["--accent" as string]: accent }}
@@ -680,6 +690,11 @@ export const render = ({ output, error, settings }: State) => {
 
   return (
     <Panel
+      /* Gailan asks macOS for frosted wallpaper behind exactly this rectangle. The
+         corner is left for Gailan to read off the panel, so it cannot be written here
+         as one number and in the stylesheet as another. */
+      id="gailan-nowplaying"
+      data-gailan-desktop-glass=""
       data-draggable={draggable}
       data-background={surface}
       style={{ ["--accent" as string]: accent }}

@@ -516,6 +516,11 @@ export const render = (
 
   const frame = (children: unknown) => (
     <Panel
+      /* Gailan asks macOS for frosted wallpaper behind exactly this rectangle. The
+         corner is left for Gailan to read off the panel, so it cannot be written here
+         as one number and in the stylesheet as another. */
+      id="gailan-system"
+      data-gailan-desktop-glass=""
       data-draggable={draggable}
       data-background={surface}
       style={{ ["--accent" as string]: accent }}
