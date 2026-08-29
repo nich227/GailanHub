@@ -408,11 +408,6 @@ const clock = (seconds: number) => {
     : minutes + ":" + pad(rest);
 };
 
-const Silent = styled("div")`
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  color: var(--dim);
-`;
 
 /* Whichever player is there, told to do one thing. The same two-step as the reading
    command: Spotify if it is running, Music otherwise. */
@@ -671,29 +666,12 @@ export const render = ({ output, error, settings }: State) => {
   const total = Number(length);
   const measured = Number.isFinite(position) && Number.isFinite(total) && total > 0;
 
-  if (!title) {
-    return (
-      <Panel
-        /* Gailan asks macOS for frosted wallpaper behind exactly this rectangle. The
-         corner is left for Gailan to read off the panel, so it cannot be written here
-         as one number and in the stylesheet as another. */
-        id="gailan-nowplaying"
-        data-gailan-desktop-glass=""
-        data-draggable={draggable}
-        data-background={surface}
-        style={accent ? { ["--accent" as string]: accent } : undefined}
-        ref={place}
-        onMouseDown={draggable ? startDrag : undefined}
-      >
-        <Beat />
-        <Marks>
-          <Mark>now playing</Mark>
-          <Dot data-state="idle" />
-        </Marks>
-        <Silent>nothing</Silent>
-      </Panel>
-    );
-  }
+  /* Nothing loaded in either player, so nothing is drawn: no panel, no glass claimed
+     behind it, and nothing for the arranging to move around. A widget that has nothing
+     to say is better off saying it by being absent than by sitting there reading
+     "nothing". An error still shows, because a broken widget that hides is a widget
+     nobody can fix. */
+  if (!title) return null;
 
   return (
     <Panel
