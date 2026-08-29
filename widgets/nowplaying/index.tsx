@@ -52,15 +52,38 @@ export const className = `
   top: 24px;
 `;
 
+/* The accent a name stands for. A widget is told which one, not which colour, so the
+   names in widget.json and the colours here are the same list. */
+const ACCENTS: Record<string, string> = {
+  red: "#d71921",
+  amber: "#ffb000",
+  green: "#2fbf71",
+  blue: "#4a9eff",
+  violet: "#a678f0",
+};
+
+const BACKGROUNDS = ["auto", "black", "white", "pink"];
+
+/* What to hand the panel: the style it should wear, and nothing at all when it should
+   follow the system, so the stylesheet's own behaviour is left alone. */
+const surfaceOf = (chosen?: string) =>
+  chosen && chosen !== "auto" && BACKGROUNDS.indexOf(chosen) > -1 ? chosen : undefined;
+
+const accentOf = (chosen?: string) => ACCENTS[chosen || ""] || ACCENTS.red;
+
 const Panel = styled("div")`
+  --surface: rgba(11, 11, 12, 0.82);
   --ink: #f4f4f2;
   --dim: rgba(244, 244, 242, 0.42);
   --rule: rgba(244, 244, 242, 0.16);
-  --red: #d71921;
-  /* the lamp beats between these two while a track runs, so it reads dark red */
-  --red-dark: #7c0d13;
-  /* and sits at this one when a track is held rather than running */
-  --red-pale: #f2868b;
+  /* The accent is a setting, so it arrives as a property rather than being
+     written here. Red is what it is when nobody has said otherwise. */
+  --accent: #d71921;
+  /* The lamp beats between the accent and a darker version of it, and sits at a
+     paler one when a track is held rather than running. Mixed from the accent so
+     that choosing a colour is enough: nothing has to be written per colour. */
+  --accent-dark: color-mix(in srgb, var(--accent) 45%, #000);
+  --accent-pale: color-mix(in srgb, var(--accent) 55%, #fff);
   /* with nothing loaded there is nothing to be red about, so it goes gray: light
      against a dark panel, dark against a light one */
   --lamp-idle: #9b9b96;
@@ -69,15 +92,40 @@ const Panel = styled("div")`
     --ink: #0b0b0c;
     --dim: rgba(11, 11, 12, 0.45);
     --rule: rgba(11, 11, 12, 0.18);
-    --red-pale: #e8a0a4;
     --lamp-idle: #55555a;
+  }
+
+
+  /* Left to itself the panel follows the system, dark on dark and light on light. Told
+     otherwise, it stays where it is put. */
+  &[data-background="black"] {
+    --surface: rgba(11, 11, 12, 0.82);
+    --ink: #f4f4f2;
+    --dim: rgba(244, 244, 242, 0.42);
+    --rule: rgba(244, 244, 242, 0.16);
+  }
+
+  &[data-background="white"] {
+    --surface: rgba(244, 244, 242, 0.9);
+    --ink: #0b0b0c;
+    --dim: rgba(11, 11, 12, 0.45);
+    --rule: rgba(11, 11, 12, 0.18);
+  }
+
+  /* Ink on pink is nearly black with the pink left in it, so the two belong together
+     rather than looking like one dropped on the other. */
+  &[data-background="pink"] {
+    --surface: rgba(242, 182, 199, 0.9);
+    --ink: #2b0f16;
+    --dim: rgba(43, 15, 22, 0.55);
+    --rule: rgba(43, 15, 22, 0.2);
   }
 
   position: relative;
   display: inline-block;
   width: 208px;
   padding: 14px 16px 12px;
-  background: rgba(11, 11, 12, 0.82);
+  background: var(--surface);
   border: 1px solid var(--rule);
   /* A squircle, as far as the web will allow. corner-shape is new enough that the
      WebKit Gailan runs on does not have it, so a generous radius carries the shape
@@ -99,7 +147,7 @@ const Panel = styled("div")`
   font-family: "SF Mono", ui-monospace, Menlo, monospace;
 
   @media (prefers-color-scheme: light) {
-    background: rgba(244, 244, 242, 0.86);
+    --surface: rgba(244, 244, 242, 0.9);
   }
 `;
 
@@ -128,18 +176,18 @@ const Dot = styled("div")`
   background: var(--lamp-idle);
 
   &[data-state="playing"] {
-    background: var(--red-dark);
+    background: var(--accent-dark);
     animation: gailan-now-playing-beat 1.3s ease-in-out infinite;
   }
 
   &[data-state="paused"] {
-    background: var(--red-pale);
+    background: var(--accent-pale);
   }
 
   @media (prefers-reduced-motion: reduce) {
     &[data-state="playing"] {
       animation: none;
-      background: var(--red-dark);
+      background: var(--accent-dark);
     }
   }
 `;
@@ -245,7 +293,7 @@ const Played = styled("div")`
   bottom: 0;
   left: 0;
   width: 0;
-  background: var(--red);
+  background: var(--accent);
   animation-name: gailan-nowplaying-progress;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
@@ -335,11 +383,11 @@ const Button = styled("button")`
   }
 
   &:active rect {
-    fill: var(--red);
+    fill: var(--accent);
   }
 
   &:focus-visible {
-    outline: 1px solid var(--red);
+    outline: 1px solid var(--accent);
     outline-offset: 2px;
   }
 `;
@@ -485,21 +533,25 @@ const startDrag = (event: any) => {
 const Beat = () => (
   <style>{`
     @keyframes gailan-now-playing-beat {
-      0%, 100% { background: var(--red-dark); }
-      50% { background: var(--red); }
+      0%, 100% { background: var(--accent-dark); }
+      50% { background: var(--accent); }
     }
   `}</style>
 );
 
-type Settings = { draggable?: boolean };
+type Settings = { draggable?: boolean; background?: string; accent?: string; };
 type State = { output: string; error?: string; settings?: Settings };
 
 export const render = ({ output, error, settings }: State) => {
   const draggable = settings?.draggable === true;
+  const surface = surfaceOf(settings?.background);
+  const accent = accentOf(settings?.accent);
   if (error) {
     return (
       <Panel
         data-draggable={draggable}
+        data-background={surface}
+        style={{ ["--accent" as string]: accent }}
         ref={place}
         onMouseDown={draggable ? startDrag : undefined}
       >
@@ -533,6 +585,8 @@ export const render = ({ output, error, settings }: State) => {
     return (
       <Panel
         data-draggable={draggable}
+        data-background={surface}
+        style={{ ["--accent" as string]: accent }}
         ref={place}
         onMouseDown={draggable ? startDrag : undefined}
       >
@@ -549,6 +603,8 @@ export const render = ({ output, error, settings }: State) => {
   return (
     <Panel
       data-draggable={draggable}
+      data-background={surface}
+      style={{ ["--accent" as string]: accent }}
       ref={place}
       onMouseDown={draggable ? startDrag : undefined}
     >

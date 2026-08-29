@@ -60,11 +60,33 @@ const Face = () => (
   `}</style>
 );
 
+/* The accent a name stands for. A widget is told which one, not which colour, so the
+   names in widget.json and the colours here are the same list. */
+const ACCENTS: Record<string, string> = {
+  red: "#d71921",
+  amber: "#ffb000",
+  green: "#2fbf71",
+  blue: "#4a9eff",
+  violet: "#a678f0",
+};
+
+const BACKGROUNDS = ["auto", "black", "white", "pink"];
+
+/* What to hand the panel: the style it should wear, and nothing at all when it should
+   follow the system, so the stylesheet's own behaviour is left alone. */
+const surfaceOf = (chosen?: string) =>
+  chosen && chosen !== "auto" && BACKGROUNDS.indexOf(chosen) > -1 ? chosen : undefined;
+
+const accentOf = (chosen?: string) => ACCENTS[chosen || ""] || ACCENTS.red;
+
 const Panel = styled("div")`
+  --surface: rgba(11, 11, 12, 0.82);
   --ink: #f4f4f2;
   --dim: rgba(244, 244, 242, 0.42);
   --rule: rgba(244, 244, 242, 0.16);
-  --red: #d71921;
+  /* The accent is a setting, so it arrives as a property rather than being
+     written here. Red is what it is when nobody has said otherwise. */
+  --accent: #d71921;
 
   @media (prefers-color-scheme: light) {
     --ink: #0b0b0c;
@@ -72,12 +94,38 @@ const Panel = styled("div")`
     --rule: rgba(11, 11, 12, 0.18);
   }
 
+
+  /* Left to itself the panel follows the system, dark on dark and light on light. Told
+     otherwise, it stays where it is put. */
+  &[data-background="black"] {
+    --surface: rgba(11, 11, 12, 0.82);
+    --ink: #f4f4f2;
+    --dim: rgba(244, 244, 242, 0.42);
+    --rule: rgba(244, 244, 242, 0.16);
+  }
+
+  &[data-background="white"] {
+    --surface: rgba(244, 244, 242, 0.9);
+    --ink: #0b0b0c;
+    --dim: rgba(11, 11, 12, 0.45);
+    --rule: rgba(11, 11, 12, 0.18);
+  }
+
+  /* Ink on pink is nearly black with the pink left in it, so the two belong together
+     rather than looking like one dropped on the other. */
+  &[data-background="pink"] {
+    --surface: rgba(242, 182, 199, 0.9);
+    --ink: #2b0f16;
+    --dim: rgba(43, 15, 22, 0.55);
+    --rule: rgba(43, 15, 22, 0.2);
+  }
+
   position: relative;
   display: inline-block;
   min-width: 208px;
   padding: 14px 16px 12px;
   /* flat, not glassy: the surface does not pretend to be lit */
-  background: rgba(11, 11, 12, 0.82);
+  background: var(--surface);
   border: 1px solid var(--rule);
   /* A squircle, as far as the web will allow. corner-shape is new enough that the
      WebKit Gailan runs on does not have it, so a generous radius carries the shape
@@ -99,7 +147,7 @@ const Panel = styled("div")`
   font-family: "SF Mono", ui-monospace, Menlo, monospace;
 
   @media (prefers-color-scheme: light) {
-    background: rgba(244, 244, 242, 0.86);
+    --surface: rgba(244, 244, 242, 0.9);
   }
 `;
 
@@ -148,7 +196,7 @@ const Seconds = styled("div")`
   font-family: "Gailan Dot Matrix", "SF Mono", ui-monospace, Menlo, monospace;
   font-size: 13px;
   letter-spacing: 0.08em;
-  color: var(--red);
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
 `;
 
@@ -194,7 +242,7 @@ const Dial = styled("svg")`
      The rotation is CSS rather than arithmetic because the widget only hears from
      the machine once a second, which is a tick however smoothly it is drawn. */
   .hand-second {
-    stroke: var(--red);
+    stroke: var(--accent);
     stroke-width: 1;
     stroke-linecap: round;
     transform-box: view-box;
@@ -337,7 +385,7 @@ function Ticks() {
   );
 }
 
-type Settings = { face?: string; hours?: string; draggable?: boolean };
+type Settings = { face?: string; hours?: string; draggable?: boolean; background?: string; accent?: string; };
 /* ---------- moving it about ---------- */
 
 /* Gailan puts a widget where its className says. Dragging has to override that, so
@@ -406,11 +454,15 @@ type State = { output: string; error?: string; settings?: Settings };
 
 export const render = ({ output, error, settings }: State) => {
   const draggable = settings?.draggable === true;
+  const surface = surfaceOf(settings?.background);
+  const accent = accentOf(settings?.accent);
 
   if (error) {
     return (
       <Panel
         data-draggable={draggable}
+        data-background={surface}
+        style={{ ["--accent" as string]: accent }}
         ref={place}
         onMouseDown={draggable ? startDrag : undefined}
       >
@@ -427,6 +479,8 @@ export const render = ({ output, error, settings }: State) => {
     return (
       <Panel
         data-draggable={draggable}
+        data-background={surface}
+        style={{ ["--accent" as string]: accent }}
         ref={place}
         onMouseDown={draggable ? startDrag : undefined}
       >
@@ -460,6 +514,8 @@ export const render = ({ output, error, settings }: State) => {
     <Panel
       data-gailan-desktop-glass={4}
       data-draggable={draggable}
+      data-background={surface}
+      style={{ ["--accent" as string]: accent }}
       ref={place}
       onMouseDown={draggable ? startDrag : undefined}
     >

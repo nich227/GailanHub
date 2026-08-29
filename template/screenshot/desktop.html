@@ -334,14 +334,28 @@
         // whichever edge the slot was pinned to. Such a widget gets the desktop, which
         // is what Gailan gives it, and is told the screen changed so anything measuring
         // itself measures again.
-        requestAnimationFrame(() => {
-          const box = slot.getBoundingClientRect();
-          if (box.width && box.height) return;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            const box = slot.getBoundingClientRect();
+            if (box.width && box.height) return;
 
-          slot.classList.add("screen");
-          slot.style.cssText = "";
-          window.dispatchEvent(new Event("resize"));
-        });
+            /* A slot with no size has either drawn out of flow or not drawn yet, and
+               the two look identical from here. What tells them apart is whether
+               anything inside it has been painted: a widget still waiting has nothing
+               at all. Getting this wrong wiped the placement of widgets that were
+               merely slow, and threw them off the frame. */
+            let painted = false;
+            slot.querySelectorAll("*").forEach((node) => {
+              const inner = node.getBoundingClientRect();
+              if (inner.width && inner.height) painted = true;
+            });
+            if (!painted) return;
+
+            slot.classList.add("screen");
+            slot.style.cssText = "";
+            window.dispatchEvent(new Event("resize"));
+          })
+        );
       });
 
       // Several widgets read as a desktop, and a desktop wants them tidy: down the

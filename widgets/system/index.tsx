@@ -144,7 +144,15 @@ export const className = `
   top: 24px;
 `;
 
+const BACKGROUNDS = ["auto", "black", "white", "pink"];
+
+/* The style the panel should wear, and nothing at all when it should follow the system,
+   so the stylesheet's own behaviour is left alone. */
+const surfaceOf = (chosen?: string) =>
+  chosen && chosen !== "auto" && BACKGROUNDS.indexOf(chosen) > -1 ? chosen : undefined;
+
 const Panel = styled("div")`
+  --surface: rgba(11, 11, 12, 0.82);
   --ink: #f4f4f2;
   --dim: rgba(244, 244, 242, 0.42);
   --rule: rgba(244, 244, 242, 0.16);
@@ -156,11 +164,37 @@ const Panel = styled("div")`
     --rule: rgba(11, 11, 12, 0.18);
   }
 
+
+  /* Left to itself the panel follows the system, dark on dark and light on light. Told
+     otherwise, it stays where it is put. */
+  &[data-background="black"] {
+    --surface: rgba(11, 11, 12, 0.82);
+    --ink: #f4f4f2;
+    --dim: rgba(244, 244, 242, 0.42);
+    --rule: rgba(244, 244, 242, 0.16);
+  }
+
+  &[data-background="white"] {
+    --surface: rgba(244, 244, 242, 0.9);
+    --ink: #0b0b0c;
+    --dim: rgba(11, 11, 12, 0.45);
+    --rule: rgba(11, 11, 12, 0.18);
+  }
+
+  /* Ink on pink is nearly black with the pink left in it, so the two belong together
+     rather than looking like one dropped on the other. */
+  &[data-background="pink"] {
+    --surface: rgba(242, 182, 199, 0.9);
+    --ink: #2b0f16;
+    --dim: rgba(43, 15, 22, 0.55);
+    --rule: rgba(43, 15, 22, 0.2);
+  }
+
   position: relative;
   display: inline-block;
   min-width: 208px;
   padding: 14px 16px 12px;
-  background: rgba(11, 11, 12, 0.82);
+  background: var(--surface);
   border: 1px solid var(--rule);
   /* A squircle, as far as the web will allow. corner-shape is new enough that the
      WebKit Gailan runs on does not have it, so a generous radius carries the shape
@@ -182,7 +216,7 @@ const Panel = styled("div")`
   font-family: "SF Mono", ui-monospace, Menlo, monospace;
 
   @media (prefers-color-scheme: light) {
-    background: rgba(244, 244, 242, 0.86);
+    --surface: rgba(244, 244, 242, 0.9);
   }
 `;
 
@@ -347,7 +381,7 @@ const startDrag = (event: any) => {
   document.addEventListener("mouseup", onUp);
 };
 
-type Settings = { draggable?: boolean; source?: Source; interval?: string | number };
+type Settings = { draggable?: boolean; source?: Source; interval?: string | number; background?: string; };
 type State = { output: string; error?: string; settings?: Settings };
 
 /* Bytes per second into something two or three figures wide, because the panel has room
@@ -367,6 +401,7 @@ export const render = (
   dispatch: (event: { output?: string; error?: string }) => void
 ) => {
   const draggable = settings?.draggable === true;
+  const surface = surfaceOf(settings?.background);
   const source: Source = READINGS[settings?.source as Source]
     ? (settings?.source as Source)
     : "ram";
@@ -389,6 +424,7 @@ export const render = (
   const frame = (children: unknown) => (
     <Panel
       data-draggable={draggable}
+      data-background={surface}
       ref={place}
       onMouseDown={draggable ? startDrag : undefined}
     >

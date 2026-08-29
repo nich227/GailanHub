@@ -13,6 +13,60 @@
   "screenshotOutput": "Human Nature|Michael Jackson|Thriller|playing|sample-cover.jpg|124|246|spotify:track:sample",
   "settings": [
     {
+      "key": "background",
+      "type": "list",
+      "label": "Background",
+      "help": "Follow the system, or hold one of these whatever the system does",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Follow appearance"
+        },
+        {
+          "value": "black",
+          "label": "Black"
+        },
+        {
+          "value": "white",
+          "label": "White"
+        },
+        {
+          "value": "pink",
+          "label": "Pink"
+        }
+      ]
+    },
+    {
+      "key": "accent",
+      "type": "list",
+      "label": "Accent",
+      "help": "The one colour on the panel",
+      "default": "red",
+      "options": [
+        {
+          "value": "red",
+          "label": "Red"
+        },
+        {
+          "value": "amber",
+          "label": "Amber"
+        },
+        {
+          "value": "green",
+          "label": "Green"
+        },
+        {
+          "value": "blue",
+          "label": "Blue"
+        },
+        {
+          "value": "violet",
+          "label": "Violet"
+        }
+      ]
+    },
+    {
       "key": "draggable",
       "type": "toggle",
       "label": "Drag to move",

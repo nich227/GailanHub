@@ -51,6 +51,60 @@
           ]
         },
         {
+          "key": "background",
+          "type": "list",
+          "label": "Background",
+          "help": "Follow the system, or hold one of these whatever the system does",
+          "default": "auto",
+          "options": [
+            {
+              "value": "auto",
+              "label": "Follow appearance"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            },
+            {
+              "value": "white",
+              "label": "White"
+            },
+            {
+              "value": "pink",
+              "label": "Pink"
+            }
+          ]
+        },
+        {
+          "key": "accent",
+          "type": "list",
+          "label": "Accent",
+          "help": "The one colour on the panel",
+          "default": "red",
+          "options": [
+            {
+              "value": "red",
+              "label": "Red"
+            },
+            {
+              "value": "amber",
+              "label": "Amber"
+            },
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "blue",
+              "label": "Blue"
+            },
+            {
+              "value": "violet",
+              "label": "Violet"
+            }
+          ]
+        },
+        {
           "key": "draggable",
           "type": "toggle",
           "label": "Drag to move",
@@ -65,11 +119,11 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 17445
+          "bytes": 19520
         },
         {
           "path": "preview.jpg",
-          "bytes": 123982
+          "bytes": 121293
         },
         {
           "path": "README.md",
@@ -77,7 +131,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 1284
+          "bytes": 2375
         }
       ]
     },
@@ -97,6 +151,60 @@
       "entry": "index.tsx",
       "settings": [
         {
+          "key": "background",
+          "type": "list",
+          "label": "Background",
+          "help": "Follow the system, or hold one of these whatever the system does",
+          "default": "auto",
+          "options": [
+            {
+              "value": "auto",
+              "label": "Follow appearance"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            },
+            {
+              "value": "white",
+              "label": "White"
+            },
+            {
+              "value": "pink",
+              "label": "Pink"
+            }
+          ]
+        },
+        {
+          "key": "accent",
+          "type": "list",
+          "label": "Accent",
+          "help": "The one colour on the panel",
+          "default": "red",
+          "options": [
+            {
+              "value": "red",
+              "label": "Red"
+            },
+            {
+              "value": "amber",
+              "label": "Amber"
+            },
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "blue",
+              "label": "Blue"
+            },
+            {
+              "value": "violet",
+              "label": "Violet"
+            }
+          ]
+        },
+        {
           "key": "draggable",
           "type": "toggle",
           "label": "Drag to move",
@@ -111,11 +219,11 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 23190
+          "bytes": 25427
         },
         {
           "path": "preview.jpg",
-          "bytes": 138495
+          "bytes": 136981
         },
         {
           "path": "README.md",
@@ -127,7 +235,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 639
+          "bytes": 1730
         }
       ]
     },
@@ -205,6 +313,31 @@
           ]
         },
         {
+          "key": "background",
+          "type": "list",
+          "label": "Background",
+          "help": "Follow the system, or hold one of these whatever the system does",
+          "default": "auto",
+          "options": [
+            {
+              "value": "auto",
+              "label": "Follow appearance"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            },
+            {
+              "value": "white",
+              "label": "White"
+            },
+            {
+              "value": "pink",
+              "label": "Pink"
+            }
+          ]
+        },
+        {
           "key": "draggable",
           "type": "toggle",
           "label": "Drag to move",
@@ -219,11 +352,11 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 20049
+          "bytes": 21295
         },
         {
           "path": "preview.jpg",
-          "bytes": 123961
+          "bytes": 121702
         },
         {
           "path": "README.md",
@@ -231,7 +364,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 1799
+          "bytes": 2336
         }
       ]
     }
