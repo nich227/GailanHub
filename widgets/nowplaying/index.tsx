@@ -22,15 +22,25 @@ export const command = [
   "osascript",
   '-e \'set a to ""\'',
   "-e 'tell application \"System Events\" to set p to name of processes'",
+  /* Duration is divided here rather than in the widget because the two players do not
+     agree on units: Spotify counts a track in milliseconds and Music counts it in
+     seconds. Both are handed over in seconds so nothing downstream has to know which
+     player answered. The url comes along because an episode says so in its url, which
+     is the only dependable way to tell a podcast from a song. */
   "-e 'if p contains \"Spotify\" then tell application \"Spotify\" to" +
     " if player state is not stopped then set a to (name of current track)" +
-    ' & "|" & (artist of current track) & "|" & (player state as string)' +
-    ' & "|" & (artwork url of current track)\'',
+    ' & "|" & (artist of current track) & "|" & (album of current track)' +
+    ' & "|" & (player state as string) & "|" & (artwork url of current track)' +
+    ' & "|" & (player position as string)' +
+    ' & "|" & (((duration of current track) / 1000) as string)' +
+    ' & "|" & (spotify url of current track)\'',
   // Music holds artwork as data rather than at a url, so there is nothing to point
   // at and the cover is left empty there
   "-e 'if a is \"\" and p contains \"Music\" then tell application \"Music\" to" +
     " if player state is not stopped then set a to (name of current track)" +
-    ' & "|" & (artist of current track) & "|" & (player state as string)\'',
+    ' & "|" & (artist of current track) & "|" & (album of current track)' +
+    ' & "|" & (player state as string) & "|" & "" & "|" & (player position as string)' +
+    ' & "|" & (duration of current track as string) & "|" & ""\'',
   "-e 'return a'",
 ].join(" ");
 
@@ -186,6 +196,11 @@ const Face = () => (
       src: url("${LETTERS}") format("woff2");
       font-display: block;
     }
+
+    @keyframes gailan-nowplaying-progress {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
   `}</style>
 );
 
@@ -210,6 +225,55 @@ const Artist = styled("div")`
   overflow: hidden;
   text-overflow: ellipsis;
 `;
+
+/* How far into the track, as a rule with one red length filled. The fill is a css
+   animation rather than a width that gets rewritten, so it moves smoothly between
+   readings instead of stepping once every few seconds: it runs for the length of the
+   track and starts partway in, with a negative delay standing for how much has already
+   played. Every reading sets it again, so it cannot drift. */
+const Progress = styled("div")`
+  position: relative;
+  height: 2px;
+  margin-top: 10px;
+  background: var(--rule);
+  overflow: hidden;
+`;
+
+const Played = styled("div")`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  background: var(--red);
+  animation-name: gailan-nowplaying-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+`;
+
+const Times = styled("div")`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+`;
+
+/* 4048 seconds is an hour and eight minutes, and a podcast is long enough that the hour
+   has to show. A song never reaches one, so it is left off. */
+const clock = (seconds: number) => {
+  const whole = Math.max(0, Math.floor(seconds));
+  const hours = Math.floor(whole / 3600);
+  const minutes = Math.floor((whole % 3600) / 60);
+  const rest = whole % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return hours > 0
+    ? hours + ":" + pad(minutes) + ":" + pad(rest)
+    : minutes + ":" + pad(rest);
+};
 
 const Silent = styled("div")`
   font-size: 13px;
@@ -450,8 +514,20 @@ export const render = ({ output, error, settings }: State) => {
   }
 
   // artwork urls carry no pipe, so splitting on it is safe
-  const [title, artist, state, artwork] = output.trim().split("|");
+  const [title, artist, album, state, artwork, at, length, url] = output
+    .trim()
+    .split("|");
   const playing = state === "playing";
+
+  /* A podcast episode has no artist, and the show it belongs to is filed as its album.
+     Spotify says so in the url as well, which is the dependable half of the test: an
+     episode of anything is spotify:episode:something. */
+  const episode = (url || "").indexOf(":episode:") > -1;
+  const by = (artist || "").trim() || (album || "").trim();
+
+  const position = Number(at);
+  const total = Number(length);
+  const measured = Number.isFinite(position) && Number.isFinite(total) && total > 0;
 
   if (!title) {
     return (
@@ -491,9 +567,35 @@ export const render = ({ output, error, settings }: State) => {
         )}
         <Words>
           <Title>{title}</Title>
-          <Artist>{artist || "unknown"}</Artist>
+          <Artist>{by || (episode ? "podcast" : "unknown")}</Artist>
         </Words>
       </Track>
+
+      {measured ? (
+        <>
+          <Progress
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={Math.round(total)}
+            aria-valuenow={Math.round(position)}
+            aria-label={`${clock(position)} of ${clock(total)}`}
+          >
+            <Played
+              style={{
+                animationDuration: `${total}s`,
+                /* how much has already played */
+                animationDelay: `-${Math.min(position, total)}s`,
+                animationPlayState: playing ? "running" : "paused",
+              }}
+            />
+          </Progress>
+
+          <Times>
+            <span>{clock(position)}</span>
+            <span>{clock(total)}</span>
+          </Times>
+        </>
+      ) : null}
 
       <Transport playing={playing} />
     </Panel>

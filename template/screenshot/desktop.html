@@ -168,6 +168,19 @@
         left: 50%;
         transform: translateX(-50%);
       }
+
+      /* A widget that covers its screen and draws inside it, the way the starter widget
+         does, needs the screen to cover. Gailan gives it one the size of the display, so
+         a slot that hugged its contents would leave it nothing to place itself against
+         and the window would land in the corner of a box with no width. */
+      .slot.screen {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: auto;
+        height: auto;
+      }
     </style>
   </head>
   <body>
@@ -315,6 +328,20 @@
           }),
           slot
         );
+
+        // A widget that draws out of flow leaves its slot with no size, and a slot with
+        // no size is no screen to place a window against: the window ends up hanging off
+        // whichever edge the slot was pinned to. Such a widget gets the desktop, which
+        // is what Gailan gives it, and is told the screen changed so anything measuring
+        // itself measures again.
+        requestAnimationFrame(() => {
+          const box = slot.getBoundingClientRect();
+          if (box.width && box.height) return;
+
+          slot.classList.add("screen");
+          slot.style.cssText = "";
+          window.dispatchEvent(new Event("resize"));
+        });
       });
 
       // Several widgets read as a desktop, and a desktop wants them tidy: down the

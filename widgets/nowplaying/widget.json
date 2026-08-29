@@ -10,7 +10,7 @@
     "music"
   ],
   "minimumGailanVersion": "1.0.0",
-  "screenshotOutput": "Human Nature|Michael Jackson|playing|sample-cover.jpg",
+  "screenshotOutput": "Human Nature|Michael Jackson|Thriller|playing|sample-cover.jpg|124|246|spotify:track:sample",
   "settings": [
     {
       "key": "draggable",

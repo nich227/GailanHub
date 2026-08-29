@@ -111,11 +111,11 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 19497
+          "bytes": 23190
         },
         {
           "path": "preview.jpg",
-          "bytes": 135135
+          "bytes": 138495
         },
         {
           "path": "README.md",
@@ -127,7 +127,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 601
+          "bytes": 639
         }
       ]
     },
@@ -223,7 +223,7 @@
         },
         {
           "path": "preview.jpg",
-          "bytes": 124741
+          "bytes": 123961
         },
         {
           "path": "README.md",

@@ -439,7 +439,38 @@ function capture(binary, url, done) {
           widgets: [...document.querySelectorAll('.slot')].map((slot) => {
             // the slot takes the widget's size, so it is the honest thing to
             // measure: a widget may render a <style> first, which has none
-            const box = slot.getBoundingClientRect();
+            let box = slot.getBoundingClientRect();
+
+            // Unless the widget draws itself out of flow, which the starter widget
+            // does: it covers the desktop and puts a window somewhere inside. Measuring
+            // the slot then reports either nothing at all or the whole screen, and
+            // neither says where the thing you can see ended up, so what it painted is
+            // measured instead.
+            const covers =
+              box.width >= ${WIDTH} - 1 && box.height >= ${HEIGHT} - 1;
+            if (!box.width || !box.height || covers) {
+              let union = null;
+              slot.querySelectorAll('*').forEach((node) => {
+                const inner = node.getBoundingClientRect();
+                if (!inner.width || !inner.height) return;
+                union = union
+                  ? {
+                      left: Math.min(union.left, inner.left),
+                      top: Math.min(union.top, inner.top),
+                      right: Math.max(union.right, inner.right),
+                      bottom: Math.max(union.bottom, inner.bottom),
+                    }
+                  : {left: inner.left, top: inner.top, right: inner.right, bottom: inner.bottom};
+              });
+              if (union) {
+                box = {
+                  x: union.left,
+                  y: union.top,
+                  width: union.right - union.left,
+                  height: union.bottom - union.top,
+                };
+              }
+            }
             return {
               // innerText, so a font-face rule is not mistaken for the readout
               text: (slot.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 48),
