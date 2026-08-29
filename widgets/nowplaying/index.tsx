@@ -11,7 +11,9 @@
  * Copyright (c) 2026 Kevin Chen. MIT licensed.
  */
 
-import { run, styled } from "gailan";
+// React comes along because the transport glyphs group their pixels in fragments, and
+// a fragment compiles to React.Fragment. Without it the widget throws and draws nothing.
+import { React, run, styled } from "gailan";
 
 /* Spotify first, then Music, and nothing at all if neither has a track loaded. The
    player's state comes along so a paused track still shows, without its lamp beating.
