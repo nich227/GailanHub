@@ -70,6 +70,38 @@
               "label": "Dark"
             },
             {
+              "value": "red",
+              "label": "Red"
+            },
+            {
+              "value": "orange",
+              "label": "Orange"
+            },
+            {
+              "value": "yellow",
+              "label": "Yellow"
+            },
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "teal",
+              "label": "Teal"
+            },
+            {
+              "value": "blue",
+              "label": "Blue"
+            },
+            {
+              "value": "indigo",
+              "label": "Indigo"
+            },
+            {
+              "value": "violet",
+              "label": "Violet"
+            },
+            {
               "value": "pink",
               "label": "Pink"
             }
@@ -77,10 +109,64 @@
         },
         {
           "key": "accent",
-          "type": "color",
+          "type": "list",
           "label": "Accent",
           "help": "The one colour on the panel",
-          "default": "#d71921ff"
+          "default": "red",
+          "options": [
+            {
+              "value": "red",
+              "label": "Red"
+            },
+            {
+              "value": "orange",
+              "label": "Orange"
+            },
+            {
+              "value": "yellow",
+              "label": "Yellow"
+            },
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "teal",
+              "label": "Teal"
+            },
+            {
+              "value": "blue",
+              "label": "Blue"
+            },
+            {
+              "value": "indigo",
+              "label": "Indigo"
+            },
+            {
+              "value": "violet",
+              "label": "Violet"
+            },
+            {
+              "value": "pink",
+              "label": "Pink"
+            },
+            {
+              "value": "brown",
+              "label": "Brown"
+            },
+            {
+              "value": "neutral",
+              "label": "Neutral"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            },
+            {
+              "value": "white",
+              "label": "White"
+            }
+          ]
         },
         {
           "key": "draggable",
@@ -97,7 +183,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 19414
+          "bytes": 21189
         },
         {
           "path": "preview.jpg",
@@ -109,7 +195,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 1977
+          "bytes": 3595
         }
       ]
     },
@@ -148,6 +234,38 @@
               "label": "Dark"
             },
             {
+              "value": "red",
+              "label": "Red"
+            },
+            {
+              "value": "orange",
+              "label": "Orange"
+            },
+            {
+              "value": "yellow",
+              "label": "Yellow"
+            },
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "teal",
+              "label": "Teal"
+            },
+            {
+              "value": "blue",
+              "label": "Blue"
+            },
+            {
+              "value": "indigo",
+              "label": "Indigo"
+            },
+            {
+              "value": "violet",
+              "label": "Violet"
+            },
+            {
               "value": "pink",
               "label": "Pink"
             }
@@ -155,10 +273,64 @@
         },
         {
           "key": "accent",
-          "type": "color",
+          "type": "list",
           "label": "Accent",
           "help": "The one colour on the panel",
-          "default": "#d71921ff"
+          "default": "red",
+          "options": [
+            {
+              "value": "red",
+              "label": "Red"
+            },
+            {
+              "value": "orange",
+              "label": "Orange"
+            },
+            {
+              "value": "yellow",
+              "label": "Yellow"
+            },
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "teal",
+              "label": "Teal"
+            },
+            {
+              "value": "blue",
+              "label": "Blue"
+            },
+            {
+              "value": "indigo",
+              "label": "Indigo"
+            },
+            {
+              "value": "violet",
+              "label": "Violet"
+            },
+            {
+              "value": "pink",
+              "label": "Pink"
+            },
+            {
+              "value": "brown",
+              "label": "Brown"
+            },
+            {
+              "value": "neutral",
+              "label": "Neutral"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            },
+            {
+              "value": "white",
+              "label": "White"
+            }
+          ]
         },
         {
           "key": "draggable",
@@ -175,7 +347,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 25321
+          "bytes": 27096
         },
         {
           "path": "preview.jpg",
@@ -191,7 +363,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 1332
+          "bytes": 2950
         }
       ]
     },
@@ -288,8 +460,101 @@
               "label": "Dark"
             },
             {
+              "value": "red",
+              "label": "Red"
+            },
+            {
+              "value": "orange",
+              "label": "Orange"
+            },
+            {
+              "value": "yellow",
+              "label": "Yellow"
+            },
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "teal",
+              "label": "Teal"
+            },
+            {
+              "value": "blue",
+              "label": "Blue"
+            },
+            {
+              "value": "indigo",
+              "label": "Indigo"
+            },
+            {
+              "value": "violet",
+              "label": "Violet"
+            },
+            {
               "value": "pink",
               "label": "Pink"
+            }
+          ]
+        },
+        {
+          "key": "accent",
+          "type": "list",
+          "label": "Accent",
+          "help": "The one colour on the panel",
+          "default": "red",
+          "options": [
+            {
+              "value": "red",
+              "label": "Red"
+            },
+            {
+              "value": "orange",
+              "label": "Orange"
+            },
+            {
+              "value": "yellow",
+              "label": "Yellow"
+            },
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "teal",
+              "label": "Teal"
+            },
+            {
+              "value": "blue",
+              "label": "Blue"
+            },
+            {
+              "value": "indigo",
+              "label": "Indigo"
+            },
+            {
+              "value": "violet",
+              "label": "Violet"
+            },
+            {
+              "value": "pink",
+              "label": "Pink"
+            },
+            {
+              "value": "brown",
+              "label": "Brown"
+            },
+            {
+              "value": "neutral",
+              "label": "Neutral"
+            },
+            {
+              "value": "black",
+              "label": "Black"
+            },
+            {
+              "value": "white",
+              "label": "White"
             }
           ]
         },
@@ -308,7 +573,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 21249
+          "bytes": 23620
         },
         {
           "path": "preview.jpg",
@@ -320,7 +585,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 2334
+          "bytes": 4110
         }
       ]
     }

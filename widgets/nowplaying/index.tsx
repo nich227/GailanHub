@@ -52,7 +52,20 @@ export const className = `
   top: 24px;
 `;
 
-const BACKGROUNDS = ["follow", "light", "dark", "pink"];
+const BACKGROUNDS = [
+  "follow",
+  "light",
+  "dark",
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "teal",
+  "blue",
+  "indigo",
+  "violet",
+  "pink",
+];
 
 /* The style the panel should wear, and nothing at all when it should follow the system,
    so the stylesheet's own behaviour is left alone. */
@@ -61,12 +74,27 @@ const surfaceOf = (chosen?: string) =>
     ? chosen
     : undefined;
 
-/* The accent is whatever colour somebody picked, which arrives as #rrggbb or #rrggbbaa.
-   Anything else is ignored rather than let through into a stylesheet. */
-const ACCENT = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+/* The accent a name stands for. A widget is told which one, not which colour, so the
+   names in widget.json and the colours here are the same list. Tailwind's 500s, which is
+   the palette most current interfaces are built from, with the red this app has always
+   used in place of theirs. */
+const ACCENTS: Record<string, string> = {
+  red: "#d71921",
+  orange: "#ff692a",
+  yellow: "#f0b13b",
+  green: "#31c950",
+  teal: "#36bba7",
+  blue: "#2b7fff",
+  indigo: "#615fff",
+  violet: "#8e51ff",
+  pink: "#f6339a",
+  brown: "#973c08",
+  neutral: "#737373",
+  black: "#0b0b0c",
+  white: "#f4f4f2",
+};
 
-const accentOf = (chosen?: string) =>
-  chosen && ACCENT.test(chosen.trim()) ? chosen.trim() : "#d71921";
+const accentOf = (chosen?: string) => ACCENTS[chosen || ""] || ACCENTS.red;
 
 const Panel = styled("div")`
   --surface: rgba(11, 11, 12, 0.82);
@@ -93,9 +121,10 @@ const Panel = styled("div")`
   }
 
 
-  /* Left to itself the panel follows the system. Told otherwise it stays put. Pink is
-     the light scheme with a modern pink where the near-white was, so it reads as a
-     light panel rather than as a third thing. */
+  /* Left to itself the panel follows the system. Told otherwise it stays put.
+     The tinted styles are the light scheme with a wash of one hue in place of
+     the near-white, and the ink is a very dark version of that same hue, so the
+     two belong to each other rather than one being dropped on the other. */
   &[data-background="dark"] {
     --surface: rgba(11, 11, 12, 0.82);
     --ink: #f4f4f2;
@@ -110,11 +139,64 @@ const Panel = styled("div")`
     --rule: rgba(11, 11, 12, 0.18);
   }
 
+  &[data-background="red"] {
+    --surface: rgba(255, 226, 226, 0.92);
+    --ink: #460809;
+  }
+
+  &[data-background="orange"] {
+    --surface: rgba(255, 237, 212, 0.92);
+    --ink: #441306;
+  }
+
+  &[data-background="yellow"] {
+    --surface: rgba(254, 249, 194, 0.92);
+    --ink: #432004;
+  }
+
+  &[data-background="green"] {
+    --surface: rgba(220, 252, 231, 0.92);
+    --ink: #032e15;
+  }
+
+  &[data-background="teal"] {
+    --surface: rgba(203, 251, 241, 0.92);
+    --ink: #022f2e;
+  }
+
+  &[data-background="blue"] {
+    --surface: rgba(219, 234, 254, 0.92);
+    --ink: #162456;
+  }
+
+  &[data-background="indigo"] {
+    --surface: rgba(224, 231, 255, 0.92);
+    --ink: #1e1a4d;
+  }
+
+  &[data-background="violet"] {
+    --surface: rgba(237, 233, 254, 0.92);
+    --ink: #2f0d68;
+  }
+
   &[data-background="pink"] {
     --surface: rgba(255, 214, 230, 0.92);
     --ink: #1f1013;
-    --dim: rgba(31, 16, 19, 0.5);
-    --rule: rgba(31, 16, 19, 0.16);
+  }
+
+  /* Every wash takes its quieter tones from its own ink, so a hue is described
+     once and the rest follows from it. */
+  &[data-background="red"],
+  &[data-background="orange"],
+  &[data-background="yellow"],
+  &[data-background="green"],
+  &[data-background="teal"],
+  &[data-background="blue"],
+  &[data-background="indigo"],
+  &[data-background="violet"],
+  &[data-background="pink"] {
+    --dim: color-mix(in srgb, var(--ink) 55%, transparent);
+    --rule: color-mix(in srgb, var(--ink) 18%, transparent);
   }
 
   position: relative;
