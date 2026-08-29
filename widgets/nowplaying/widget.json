@@ -17,19 +17,19 @@
       "type": "list",
       "label": "Background",
       "help": "Follow the system, or hold one of these whatever the system does",
-      "default": "auto",
+      "default": "follow",
       "options": [
         {
-          "value": "auto",
-          "label": "Follow appearance"
+          "value": "follow",
+          "label": "Follow system"
         },
         {
-          "value": "black",
-          "label": "Black"
+          "value": "light",
+          "label": "Light"
         },
         {
-          "value": "white",
-          "label": "White"
+          "value": "dark",
+          "label": "Dark"
         },
         {
           "value": "pink",
@@ -39,32 +39,10 @@
     },
     {
       "key": "accent",
-      "type": "list",
+      "type": "color",
       "label": "Accent",
       "help": "The one colour on the panel",
-      "default": "red",
-      "options": [
-        {
-          "value": "red",
-          "label": "Red"
-        },
-        {
-          "value": "amber",
-          "label": "Amber"
-        },
-        {
-          "value": "green",
-          "label": "Green"
-        },
-        {
-          "value": "blue",
-          "label": "Blue"
-        },
-        {
-          "value": "violet",
-          "label": "Violet"
-        }
-      ]
+      "default": "#d71921ff"
     },
     {
       "key": "draggable",

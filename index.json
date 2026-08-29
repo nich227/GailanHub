@@ -55,19 +55,19 @@
           "type": "list",
           "label": "Background",
           "help": "Follow the system, or hold one of these whatever the system does",
-          "default": "auto",
+          "default": "follow",
           "options": [
             {
-              "value": "auto",
-              "label": "Follow appearance"
+              "value": "follow",
+              "label": "Follow system"
             },
             {
-              "value": "black",
-              "label": "Black"
+              "value": "light",
+              "label": "Light"
             },
             {
-              "value": "white",
-              "label": "White"
+              "value": "dark",
+              "label": "Dark"
             },
             {
               "value": "pink",
@@ -77,32 +77,10 @@
         },
         {
           "key": "accent",
-          "type": "list",
+          "type": "color",
           "label": "Accent",
           "help": "The one colour on the panel",
-          "default": "red",
-          "options": [
-            {
-              "value": "red",
-              "label": "Red"
-            },
-            {
-              "value": "amber",
-              "label": "Amber"
-            },
-            {
-              "value": "green",
-              "label": "Green"
-            },
-            {
-              "value": "blue",
-              "label": "Blue"
-            },
-            {
-              "value": "violet",
-              "label": "Violet"
-            }
-          ]
+          "default": "#d71921ff"
         },
         {
           "key": "draggable",
@@ -119,11 +97,11 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 19520
+          "bytes": 19414
         },
         {
           "path": "preview.jpg",
-          "bytes": 121293
+          "bytes": 119129
         },
         {
           "path": "README.md",
@@ -131,7 +109,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 2375
+          "bytes": 1977
         }
       ]
     },
@@ -155,19 +133,19 @@
           "type": "list",
           "label": "Background",
           "help": "Follow the system, or hold one of these whatever the system does",
-          "default": "auto",
+          "default": "follow",
           "options": [
             {
-              "value": "auto",
-              "label": "Follow appearance"
+              "value": "follow",
+              "label": "Follow system"
             },
             {
-              "value": "black",
-              "label": "Black"
+              "value": "light",
+              "label": "Light"
             },
             {
-              "value": "white",
-              "label": "White"
+              "value": "dark",
+              "label": "Dark"
             },
             {
               "value": "pink",
@@ -177,32 +155,10 @@
         },
         {
           "key": "accent",
-          "type": "list",
+          "type": "color",
           "label": "Accent",
           "help": "The one colour on the panel",
-          "default": "red",
-          "options": [
-            {
-              "value": "red",
-              "label": "Red"
-            },
-            {
-              "value": "amber",
-              "label": "Amber"
-            },
-            {
-              "value": "green",
-              "label": "Green"
-            },
-            {
-              "value": "blue",
-              "label": "Blue"
-            },
-            {
-              "value": "violet",
-              "label": "Violet"
-            }
-          ]
+          "default": "#d71921ff"
         },
         {
           "key": "draggable",
@@ -219,11 +175,11 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 25427
+          "bytes": 25321
         },
         {
           "path": "preview.jpg",
-          "bytes": 136981
+          "bytes": 136928
         },
         {
           "path": "README.md",
@@ -235,7 +191,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 1730
+          "bytes": 1332
         }
       ]
     },
@@ -317,19 +273,19 @@
           "type": "list",
           "label": "Background",
           "help": "Follow the system, or hold one of these whatever the system does",
-          "default": "auto",
+          "default": "follow",
           "options": [
             {
-              "value": "auto",
-              "label": "Follow appearance"
+              "value": "follow",
+              "label": "Follow system"
             },
             {
-              "value": "black",
-              "label": "Black"
+              "value": "light",
+              "label": "Light"
             },
             {
-              "value": "white",
-              "label": "White"
+              "value": "dark",
+              "label": "Dark"
             },
             {
               "value": "pink",
@@ -352,11 +308,11 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 21295
+          "bytes": 21249
         },
         {
           "path": "preview.jpg",
-          "bytes": 121702
+          "bytes": 116560
         },
         {
           "path": "README.md",
@@ -364,7 +320,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 2336
+          "bytes": 2334
         }
       ]
     }

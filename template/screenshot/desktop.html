@@ -364,25 +364,42 @@
       // height, and scaling by transform keeps that arithmetic in one place.
       if (arrange === "right" && slots.length) {
         setTimeout(() => {
-          let top = BAR + TOP_INSET;
+          const floor = desktop.clientHeight - DOCK;
+          const ceiling = BAR + TOP_INSET;
+          let top = ceiling;
+          let right = INSET;
+          let column = 0;
 
           slots.forEach((slot) => {
             const box = slot.getBoundingClientRect();
+            const height = box.height * zoom;
+            const width = box.width * zoom;
+
+            /* No room below means another column, to the left of this one. Widgets used
+               to be stacked until they ran off the bottom of the picture, which put a
+               ceiling on how large they could be drawn: three in a column had to be
+               small enough for three. */
+            if (top > ceiling && top + height > floor) {
+              right += column + GAP;
+              top = ceiling;
+              column = 0;
+            }
 
             slot.style.cssText =
               "position: absolute;" +
               "width: fit-content; height: fit-content;" +
-              "right: " + INSET + "px;" +
+              "right: " + Math.round(right) + "px;" +
               "top: " + Math.round(top) + "px;" +
               "transform: scale(" + zoom + ");" +
               "transform-origin: top right;";
 
-            top += box.height * zoom + GAP;
+            top += height + GAP;
+            column = Math.max(column, width);
           });
 
-          const overflow = top - GAP - (desktop.clientHeight - DOCK);
+          const overflow = top - GAP - floor;
           if (overflow > 0) {
-            console.warn("the column is " + Math.round(overflow) + "px too tall");
+            console.warn("the last column is " + Math.round(overflow) + "px too tall");
           }
         }, 700);
       }
@@ -398,9 +415,12 @@
           const box = slot.getBoundingClientRect();
           if (!box.width || !box.height) return;
 
+          /* Most of the frame, not most of the middle of it. A portrait of a widget is
+             for reading the widget, and at the old fractions there was more wallpaper
+             than panel. Enough is left that it still reads as a desktop. */
           const room = {
-            width: desktop.clientWidth * 0.78,
-            height: (desktop.clientHeight - BAR - DOCK) * 0.86,
+            width: desktop.clientWidth * 0.92,
+            height: (desktop.clientHeight - BAR - DOCK) * 0.95,
           };
           const scale = Math.min(room.width / box.width, room.height / box.height);
           if (scale <= 1) return;

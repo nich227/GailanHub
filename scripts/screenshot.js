@@ -137,7 +137,9 @@ const theme = option('theme', 'light');
 // several widgets are a desktop, and a desktop reads better tidy: down the right,
 // evenly spaced, and a little larger than life so they can be seen
 const arrange = option('arrange', single ? 'own' : 'right');
-const zoom = option('zoom', single ? '1' : '1.25');
+/* Several widgets share the frame, so none of them can fill it, but at life size they
+   are small in a 1280 wide desktop and the picture stops being about them. */
+const zoom = option('zoom', single ? '1' : '1.9');
 
 function defaultSettings(manifest) {
   const values = {};

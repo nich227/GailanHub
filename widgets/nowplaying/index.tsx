@@ -52,24 +52,21 @@ export const className = `
   top: 24px;
 `;
 
-/* The accent a name stands for. A widget is told which one, not which colour, so the
-   names in widget.json and the colours here are the same list. */
-const ACCENTS: Record<string, string> = {
-  red: "#d71921",
-  amber: "#ffb000",
-  green: "#2fbf71",
-  blue: "#4a9eff",
-  violet: "#a678f0",
-};
+const BACKGROUNDS = ["follow", "light", "dark", "pink"];
 
-const BACKGROUNDS = ["auto", "black", "white", "pink"];
-
-/* What to hand the panel: the style it should wear, and nothing at all when it should
-   follow the system, so the stylesheet's own behaviour is left alone. */
+/* The style the panel should wear, and nothing at all when it should follow the system,
+   so the stylesheet's own behaviour is left alone. */
 const surfaceOf = (chosen?: string) =>
-  chosen && chosen !== "auto" && BACKGROUNDS.indexOf(chosen) > -1 ? chosen : undefined;
+  chosen && chosen !== "follow" && BACKGROUNDS.indexOf(chosen) > -1
+    ? chosen
+    : undefined;
 
-const accentOf = (chosen?: string) => ACCENTS[chosen || ""] || ACCENTS.red;
+/* The accent is whatever colour somebody picked, which arrives as #rrggbb or #rrggbbaa.
+   Anything else is ignored rather than let through into a stylesheet. */
+const ACCENT = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
+const accentOf = (chosen?: string) =>
+  chosen && ACCENT.test(chosen.trim()) ? chosen.trim() : "#d71921";
 
 const Panel = styled("div")`
   --surface: rgba(11, 11, 12, 0.82);
@@ -96,29 +93,28 @@ const Panel = styled("div")`
   }
 
 
-  /* Left to itself the panel follows the system, dark on dark and light on light. Told
-     otherwise, it stays where it is put. */
-  &[data-background="black"] {
+  /* Left to itself the panel follows the system. Told otherwise it stays put. Pink is
+     the light scheme with a modern pink where the near-white was, so it reads as a
+     light panel rather than as a third thing. */
+  &[data-background="dark"] {
     --surface: rgba(11, 11, 12, 0.82);
     --ink: #f4f4f2;
     --dim: rgba(244, 244, 242, 0.42);
     --rule: rgba(244, 244, 242, 0.16);
   }
 
-  &[data-background="white"] {
+  &[data-background="light"] {
     --surface: rgba(244, 244, 242, 0.9);
     --ink: #0b0b0c;
     --dim: rgba(11, 11, 12, 0.45);
     --rule: rgba(11, 11, 12, 0.18);
   }
 
-  /* Ink on pink is nearly black with the pink left in it, so the two belong together
-     rather than looking like one dropped on the other. */
   &[data-background="pink"] {
-    --surface: rgba(242, 182, 199, 0.9);
-    --ink: #2b0f16;
-    --dim: rgba(43, 15, 22, 0.55);
-    --rule: rgba(43, 15, 22, 0.2);
+    --surface: rgba(255, 214, 230, 0.92);
+    --ink: #1f1013;
+    --dim: rgba(31, 16, 19, 0.5);
+    --rule: rgba(31, 16, 19, 0.16);
   }
 
   position: relative;
