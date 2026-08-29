@@ -12,7 +12,7 @@
 // fragment compiles to React.Fragment. Without it the analog face threw on every
 // render and drew nothing at all, while the numerals, which use no fragments, were
 // perfectly happy.
-import { React, styled } from "gailan";
+import { constrainDrag, React, styled } from "gailan";
 
 /* The machine is asked what time it is, once, and everything shown is worked out from
    that: the two clock forms, the date, and how far through the year it is. Asking `date`
@@ -376,15 +376,11 @@ const startDrag = (event: any) => {
   const grabY = event.clientY - rect.top;
 
   const onMove = (moved: MouseEvent) => {
-    /* far enough onto the screen to still be caught hold of */
-    const left = Math.max(
-      0,
-      Math.min(window.innerWidth - rect.width, moved.clientX - grabX)
-    );
-    const top = Math.max(
-      0,
-      Math.min(window.innerHeight - 40, moved.clientY - grabY)
-    );
+    /* Up against the other widgets but not through them, and never off the screen */
+    const { left, top } = constrainDrag(box, {
+      left: moved.clientX - grabX,
+      top: moved.clientY - grabY,
+    });
     box.style.left = `${left}px`;
     box.style.top = `${top}px`;
     box.style.right = "auto";

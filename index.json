@@ -65,7 +65,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 15172
+          "bytes": 17445
         },
         {
           "path": "preview.jpg",
@@ -106,8 +106,12 @@
       ],
       "files": [
         {
+          "path": "dotmatrix-OFL.txt",
+          "bytes": 4492
+        },
+        {
           "path": "index.tsx",
-          "bytes": 7181
+          "bytes": 11216
         },
         {
           "path": "preview.jpg",
@@ -149,11 +153,11 @@
       "files": [
         {
           "path": "index.tsx",
-          "bytes": 12690
+          "bytes": 13142
         },
         {
           "path": "preview.jpg",
-          "bytes": 135092
+          "bytes": 135135
         },
         {
           "path": "README.md",

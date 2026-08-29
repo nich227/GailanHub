@@ -13,7 +13,7 @@
 
 // React comes along because the transport glyphs group their pixels in fragments, and
 // a fragment compiles to React.Fragment. Without it the widget throws and draws nothing.
-import { React, run, styled } from "gailan";
+import { constrainDrag, React, run, styled } from "gailan";
 
 /* Spotify first, then Music, and nothing at all if neither has a track loaded. The
    player's state comes along so a paused track still shows, without its lamp beating.
@@ -39,7 +39,7 @@ export const refreshFrequency = 5000;
 
 export const className = `
   left: 24px;
-  top: 376px;
+  top: 24px;
 `;
 
 const Panel = styled("div")`
@@ -367,15 +367,11 @@ const startDrag = (event: any) => {
   const grabY = event.clientY - rect.top;
 
   const onMove = (moved: MouseEvent) => {
-    /* far enough onto the screen to still be caught hold of */
-    const left = Math.max(
-      0,
-      Math.min(window.innerWidth - rect.width, moved.clientX - grabX)
-    );
-    const top = Math.max(
-      0,
-      Math.min(window.innerHeight - 40, moved.clientY - grabY)
-    );
+    /* Up against the other widgets but not through them, and never off the screen */
+    const { left, top } = constrainDrag(box, {
+      left: moved.clientX - grabX,
+      top: moved.clientY - grabY,
+    });
     box.style.left = `${left}px`;
     box.style.top = `${top}px`;
     box.style.right = "auto";

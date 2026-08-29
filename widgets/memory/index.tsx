@@ -8,7 +8,7 @@
  * Copyright (c) 2026 Kevin Chen. MIT licensed.
  */
 
-import { styled } from "gailan";
+import { constrainDrag, styled } from "gailan";
 
 /* memory_pressure reports how much is free, which is the number worth trusting:
    macOS fills memory on purpose, so "used" from vm_stat reads alarmingly high for
@@ -23,7 +23,7 @@ export const refreshFrequency = 5000;
 
 export const className = `
   left: 24px;
-  top: 200px;
+  top: 24px;
 `;
 
 const Panel = styled("div")`
@@ -90,11 +90,31 @@ const Readout = styled("div")`
   gap: 4px;
 `;
 
+/* The reading is set in the same dot matrix the clock tells the time in, so the two
+   widgets read as one set. Carried here rather than shared from the clock: a widget
+   has to stand on its own, and the face is 2KB. DotGothic16, under the SIL Open Font
+   License, which is in dotmatrix-OFL.txt. */
+const NUMERALS =
+  "data:font/ttf;base64,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";
+
+/* The at-rule goes in a style element and not in a styled component. Emotion
+   serialises a component's css when the component is built, and an at-rule in there
+   takes the whole widget down with it. */
+const Face = () => (
+  <style>{`
+    @font-face {
+      font-family: "Gailan Dot Matrix";
+      src: url("${NUMERALS}") format("truetype");
+      font-display: block;
+    }
+  `}</style>
+);
+
 const Percent = styled("div")`
+  font-family: "Gailan Dot Matrix", "SF Mono", ui-monospace, Menlo, monospace;
   font-size: 40px;
   line-height: 0.95;
-  letter-spacing: -0.02em;
-  font-weight: 500;
+  letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
 `;
 
@@ -180,15 +200,11 @@ const startDrag = (event: any) => {
   const grabY = event.clientY - rect.top;
 
   const onMove = (moved: MouseEvent) => {
-    /* far enough onto the screen to still be caught hold of */
-    const left = Math.max(
-      0,
-      Math.min(window.innerWidth - rect.width, moved.clientX - grabX)
-    );
-    const top = Math.max(
-      0,
-      Math.min(window.innerHeight - 40, moved.clientY - grabY)
-    );
+    /* Up against the other widgets but not through them, and never off the screen */
+    const { left, top } = constrainDrag(box, {
+      left: moved.clientX - grabX,
+      top: moved.clientY - grabY,
+    });
     box.style.left = `${left}px`;
     box.style.top = `${top}px`;
     box.style.right = "auto";
@@ -258,6 +274,8 @@ export const render = ({ output, error, settings }: State) => {
         <Mark>memory in use</Mark>
         <Mark>{used >= 90 ? "high" : ""}</Mark>
       </Marks>
+
+      <Face />
 
       <Readout>
         <Percent>{used}</Percent>
