@@ -102,16 +102,23 @@ const ACCENTS: Record<string, string> = {
   white: "#f4f4f2",
 };
 
-const accentOf = (chosen?: string) => ACCENTS[chosen || ""] || ACCENTS.red;
+/* Nothing at all when it should follow the system, so the stylesheet's own
+   answer stands. A name that is not offered any more is treated the same way,
+   rather than being passed through to a stylesheet. */
+const accentOf = (chosen?: string) =>
+  chosen && chosen !== "follow" ? ACCENTS[chosen] : undefined;
 
 const Panel = styled("div")`
   --surface: rgba(11, 11, 12, 0.82);
   --ink: #f4f4f2;
   --dim: rgba(244, 244, 242, 0.42);
   --rule: rgba(244, 244, 242, 0.16);
-  /* The accent is a setting, so it arrives as a property rather than being
-     written here. Red is what it is when nobody has said otherwise. */
+  /* The accent is a setting. Left alone it is the colour macOS is set to use, which
+     WebKit hands over as AccentColor, so the panel agrees with the rest of the system
+     without being told. The red before it is what shows where that is not understood,
+     and a name chosen in settings arrives as a property and wins over both. */
   --accent: #d71921;
+  --accent: AccentColor;
 
   @media (prefers-color-scheme: light) {
     --ink: #0b0b0c;
@@ -540,7 +547,7 @@ export const render = ({ output, error, settings }: State) => {
       <Panel
         data-draggable={draggable}
         data-background={surface}
-        style={{ ["--accent" as string]: accent }}
+        style={accent ? { ["--accent" as string]: accent } : undefined}
         ref={place}
         onMouseDown={draggable ? startDrag : undefined}
       >
@@ -558,7 +565,7 @@ export const render = ({ output, error, settings }: State) => {
       <Panel
         data-draggable={draggable}
         data-background={surface}
-        style={{ ["--accent" as string]: accent }}
+        style={accent ? { ["--accent" as string]: accent } : undefined}
         ref={place}
         onMouseDown={draggable ? startDrag : undefined}
       >
@@ -601,7 +608,7 @@ export const render = ({ output, error, settings }: State) => {
       data-gailan-desktop-glass=""
       data-draggable={draggable}
       data-background={surface}
-      style={{ ["--accent" as string]: accent }}
+      style={accent ? { ["--accent" as string]: accent } : undefined}
       ref={place}
       onMouseDown={draggable ? startDrag : undefined}
     >

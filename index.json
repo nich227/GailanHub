@@ -111,9 +111,13 @@
           "key": "accent",
           "type": "list",
           "label": "Accent",
-          "help": "The one colour on the panel",
-          "default": "red",
+          "help": "The one colour on the panel. Follow system uses the accent colour macOS is set to.",
+          "default": "follow",
           "options": [
+            {
+              "value": "follow",
+              "label": "Follow system"
+            },
             {
               "value": "red",
               "label": "Red"
@@ -183,7 +187,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 21759
+          "bytes": 22274
         },
         {
           "path": "preview.jpg",
@@ -195,7 +199,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 3595
+          "bytes": 3738
         }
       ]
     },
@@ -275,9 +279,13 @@
           "key": "accent",
           "type": "list",
           "label": "Accent",
-          "help": "The one colour on the panel",
-          "default": "red",
+          "help": "The one colour on the panel. Follow system uses the accent colour macOS is set to.",
+          "default": "follow",
           "options": [
+            {
+              "value": "follow",
+              "label": "Follow system"
+            },
             {
               "value": "red",
               "label": "Red"
@@ -347,7 +355,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 27993
+          "bytes": 28508
         },
         {
           "path": "preview.jpg",
@@ -363,7 +371,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 2950
+          "bytes": 3093
         }
       ]
     },
@@ -501,9 +509,13 @@
           "key": "accent",
           "type": "list",
           "label": "Accent",
-          "help": "The one colour on the panel",
-          "default": "red",
+          "help": "The one colour on the panel. Follow system uses the accent colour macOS is set to.",
+          "default": "follow",
           "options": [
+            {
+              "value": "follow",
+              "label": "Follow system"
+            },
             {
               "value": "red",
               "label": "Red"
@@ -573,7 +585,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 23911
+          "bytes": 24384
         },
         {
           "path": "preview.jpg",
@@ -585,7 +597,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 4110
+          "bytes": 4253
         }
       ]
     }

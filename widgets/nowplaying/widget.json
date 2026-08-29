@@ -73,9 +73,13 @@
       "key": "accent",
       "type": "list",
       "label": "Accent",
-      "help": "The one colour on the panel",
-      "default": "red",
+      "help": "The one colour on the panel. Follow system uses the accent colour macOS is set to.",
+      "default": "follow",
       "options": [
+        {
+          "value": "follow",
+          "label": "Follow system"
+        },
         {
           "value": "red",
           "label": "Red"
