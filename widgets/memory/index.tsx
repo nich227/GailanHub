@@ -114,7 +114,9 @@ const Percent = styled("div")`
   font-family: "Gailan Dot Matrix", "SF Mono", ui-monospace, Menlo, monospace;
   font-size: 40px;
   line-height: 0.95;
-  letter-spacing: 0.04em;
+  /* a touch wider than the clock sets its time, since there are only two figures here
+     and they have room to breathe */
+  letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
 `;
 
