@@ -21,7 +21,7 @@ const READINGS: Record<
      machine that is perfectly happy. Compressed and wired pages come along for the
      ride. */
   ram: {
-    label: "memory in use",
+    label: "RAM usage",
     command:
       "memory_pressure | awk '/System-wide memory free percentage/ " +
       "{ gsub(/%/, \"\", $5); print 100 - $5 }'",
@@ -32,7 +32,7 @@ const READINGS: Record<
      since the machine started and says nothing about now. Idle is the field to read;
      user and system do not add up to the rest of it. */
   cpu: {
-    label: "processor at work",
+    label: "CPU usage",
     command:
       "top -l 2 -n 0 -s 1 | grep 'CPU usage' | tail -1 | " +
       "awk '{ gsub(/%/, \"\", $7); print 100 - $7 }'",
@@ -43,7 +43,7 @@ const READINGS: Record<
      reports a quarter full on a disk that is five sixths full, which is the number
      nobody wants. Older systems without that layout fall back to the root. */
   disk: {
-    label: "disk in use",
+    label: "disk usage",
     command:
       "(df -k /System/Volumes/Data 2>/dev/null || df -k /) | tail -1 | " +
       "awk '{ gsub(/%/, \"\", $5); print $5 }'",
@@ -54,7 +54,7 @@ const READINGS: Record<
      the loopback left out, since talking to itself is not traffic. A total is not a
      rate, so the rate is worked out here from the gap between two of them. */
   network: {
-    label: "network traffic",
+    label: "network usage",
     command:
       "netstat -ibn | awk 'NR > 1 && $1 !~ /^lo/ && !seen[$1]++ && " +
       "$7 ~ /^[0-9]+$/ { rx += $7; tx += $10 } END { print rx + tx }'",
@@ -77,8 +77,7 @@ let previousTotal: { bytes: number; at: number } | null = null;
 const FLOOR = 256 * 1024;
 let ceiling = FLOOR;
 
-export const command = () => {
-  const source = wanted;
+const measure = (source: Source) => {
   const reading = READINGS[source] || READINGS.ram;
 
   return run(reading.command).then((text: string) => {
@@ -101,7 +100,43 @@ export const command = () => {
   });
 };
 
-/* None of this moves the way a clock does. */
+const INTERVALS = [1, 2, 5, 10, 30, 60];
+
+/* How often a reading is wanted, and when the last one was taken. */
+let chosenInterval = 5000;
+let takenAt = 0;
+let lastReading = "";
+
+/* Gailan asks how long to wait after every run, and it asks the object it holds, which
+   is a copy of these exports rather than these exports themselves. Setting it here sets
+   it on the thing that is actually read.
+
+   The wait is capped well below the longest interval on offer. Waking up costs nothing;
+   it is the reading that costs something, and that is only taken when it is due. Without
+   the cap, going from a minute down to a second would mean waiting out the minute first. */
+const LONGEST_WAIT = 5000;
+
+export function command(this: { refreshFrequency?: number }) {
+  if (this) this.refreshFrequency = Math.min(chosenInterval, LONGEST_WAIT);
+
+  /* a little tolerance, so a run that arrives a few milliseconds early is not made to
+     wait a whole interval more */
+  if (Date.now() - takenAt < chosenInterval - 250) {
+    return Promise.resolve(lastReading);
+  }
+
+  return take(wanted);
+}
+
+const take = (source: Source) => {
+  takenAt = Date.now();
+  return measure(source).then((reading) => {
+    lastReading = reading;
+    return reading;
+  });
+};
+
+/* Where it starts, before the first run has had a chance to say otherwise. */
 export const refreshFrequency = 5000;
 
 export const className = `
@@ -312,7 +347,7 @@ const startDrag = (event: any) => {
   document.addEventListener("mouseup", onUp);
 };
 
-type Settings = { draggable?: boolean; source?: Source };
+type Settings = { draggable?: boolean; source?: Source; interval?: string | number };
 type State = { output: string; error?: string; settings?: Settings };
 
 /* Bytes per second into something two or three figures wide, because the panel has room
@@ -327,15 +362,29 @@ const asRate = (perSecond: number) => {
   return { value: String(Math.round(perSecond / 1024)), unit: "KB/s" };
 };
 
-export const render = ({ output, error, settings }: State) => {
+export const render = (
+  { output, error, settings }: State,
+  dispatch: (event: { output?: string; error?: string }) => void
+) => {
   const draggable = settings?.draggable === true;
   const source: Source = READINGS[settings?.source as Source]
     ? (settings?.source as Source)
     : "ram";
   const reading = READINGS[source];
 
-  /* what the next run will fetch */
-  wanted = source;
+  const chosen = Number(settings?.interval);
+  chosenInterval = (INTERVALS.indexOf(chosen) > -1 ? chosen : 5) * 1000;
+
+  /* Asking for something else should not mean waiting out the rest of the interval,
+     which at a minute is a long time to look at nothing. The choice is taken now and
+     the reading fetched straight away; the timer carries on from wherever it was. */
+  if (source !== wanted) {
+    wanted = source;
+    take(source).then(
+      (fetched) => dispatch({ output: fetched }),
+      (err) => dispatch({ error: String((err && err.message) || err) })
+    );
+  }
 
   const frame = (children: unknown) => (
     <Panel

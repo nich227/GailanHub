@@ -148,8 +148,8 @@
       "settings": [
         {
           "key": "source",
-          "type": "choice",
-          "label": "Reading",
+          "type": "list",
+          "label": "Metric to monitor",
           "help": "What the panel watches",
           "default": "ram",
           "options": [
@@ -172,6 +172,39 @@
           ]
         },
         {
+          "key": "interval",
+          "type": "list",
+          "label": "Update every",
+          "help": "How often the reading is taken. A processor reading costs a second of sampling, so it cannot go faster than that.",
+          "default": "5",
+          "options": [
+            {
+              "value": "1",
+              "label": "1 second"
+            },
+            {
+              "value": "2",
+              "label": "2 seconds"
+            },
+            {
+              "value": "5",
+              "label": "5 seconds"
+            },
+            {
+              "value": "10",
+              "label": "10 seconds"
+            },
+            {
+              "value": "30",
+              "label": "30 seconds"
+            },
+            {
+              "value": "60",
+              "label": "1 minute"
+            }
+          ]
+        },
+        {
           "key": "draggable",
           "type": "toggle",
           "label": "Drag to move",
@@ -186,7 +219,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 18181
+          "bytes": 20049
         },
         {
           "path": "preview.jpg",
@@ -198,7 +231,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 1062
+          "bytes": 1799
         }
       ]
     }
