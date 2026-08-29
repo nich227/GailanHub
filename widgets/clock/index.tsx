@@ -590,7 +590,15 @@ export const render = ({ output, error, settings }: State) => {
 
   return (
     <Panel
-      data-gailan-desktop-glass={4}
+      /* Named, so the glass behind it is the same glass view from one render to the
+         next. Without a name it is identified by its place among the claimed regions,
+         which shifts as widgets come and go. */
+      id="gailan-clock"
+      /* The glass goes behind the panel, so it wants the panel's own corner. Naming a
+         number here meant naming it twice: this said 4 while the panel is rounded to 18,
+         and the glass showed past the corners. Left empty, Gailan reads the radius off
+         the panel itself and the two cannot drift apart. */
+      data-gailan-desktop-glass=""
       data-draggable={draggable}
       data-background={surface}
       style={{ ["--accent" as string]: accent }}
