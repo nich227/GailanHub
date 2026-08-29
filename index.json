@@ -82,52 +82,6 @@
       ]
     },
     {
-      "name": "memory",
-      "title": "Memory",
-      "description": "How much of your memory is in use, on a scale you can read a value off",
-      "author": "Kevin Chen",
-      "license": "MIT",
-      "version": "1.0.0",
-      "tags": [
-        "system"
-      ],
-      "homepage": null,
-      "path": "widgets/memory",
-      "screenshot": "widgets/memory/preview.jpg",
-      "entry": "index.tsx",
-      "settings": [
-        {
-          "key": "draggable",
-          "type": "toggle",
-          "label": "Drag to move",
-          "help": "Hold and drag the widget to place it. Needs interaction turned on in Gailan.",
-          "default": false
-        }
-      ],
-      "files": [
-        {
-          "path": "dotmatrix-OFL.txt",
-          "bytes": 4492
-        },
-        {
-          "path": "index.tsx",
-          "bytes": 11340
-        },
-        {
-          "path": "preview.jpg",
-          "bytes": 124741
-        },
-        {
-          "path": "README.md",
-          "bytes": 656
-        },
-        {
-          "path": "widget.json",
-          "bytes": 551
-        }
-      ]
-    },
-    {
       "name": "nowplaying",
       "title": "Now Playing",
       "description": "What Spotify or Music is playing, with the cover and controls",
@@ -174,6 +128,77 @@
         {
           "path": "widget.json",
           "bytes": 601
+        }
+      ]
+    },
+    {
+      "name": "system",
+      "title": "System Monitor",
+      "description": "Memory, processor, disk or network, on a scale you can read a value off",
+      "author": "Kevin Chen",
+      "license": "MIT",
+      "version": "1.0.0",
+      "tags": [
+        "system"
+      ],
+      "homepage": null,
+      "path": "widgets/system",
+      "screenshot": "widgets/system/preview.jpg",
+      "entry": "index.tsx",
+      "settings": [
+        {
+          "key": "source",
+          "type": "choice",
+          "label": "Reading",
+          "help": "What the panel watches",
+          "default": "ram",
+          "options": [
+            {
+              "value": "ram",
+              "label": "RAM Usage"
+            },
+            {
+              "value": "cpu",
+              "label": "CPU Usage"
+            },
+            {
+              "value": "disk",
+              "label": "Disk Usage"
+            },
+            {
+              "value": "network",
+              "label": "Network Usage"
+            }
+          ]
+        },
+        {
+          "key": "draggable",
+          "type": "toggle",
+          "label": "Drag to move",
+          "help": "Hold and drag the widget to place it. Needs interaction turned on in Gailan.",
+          "default": false
+        }
+      ],
+      "files": [
+        {
+          "path": "dotmatrix-OFL.txt",
+          "bytes": 4492
+        },
+        {
+          "path": "index.tsx",
+          "bytes": 18181
+        },
+        {
+          "path": "preview.jpg",
+          "bytes": 124741
+        },
+        {
+          "path": "README.md",
+          "bytes": 2124
+        },
+        {
+          "path": "widget.json",
+          "bytes": 1062
         }
       ]
     }

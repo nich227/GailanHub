@@ -16,7 +16,7 @@
 // framed the same way.
 //
 //   npm run screenshot clock                       one widget, filling the frame
-//   npm run screenshot -- --widgets=clock,memory    several, where each sits
+//   npm run screenshot -- --widgets=clock,system    several, where each sits
 //   npm run screenshot clock -- --theme=dark
 //
 // With electron available the capture is automatic. Without it, the page is served
@@ -61,7 +61,7 @@ function usage(message) {
   console.error('  --position=right|left|center   overrides the widget\'s own');
   console.error('  --theme=light|dark    which appearance to render');
   console.error('  --output=<text>       stand in for the command output');
-  console.error('  --outputs=<json>      per widget, as {"memory": "45"}');
+  console.error('  --outputs=<json>      per widget, as {"system": "ram 45"}');
   console.error('  --arrange=right|own   down the right, or where each says');
   console.error('  --zoom=<n>            scale the widgets in the frame');
   console.error('  --settings=<json>     settings to render with');

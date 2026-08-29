@@ -1,0 +1,48 @@
+{
+  "name": "system",
+  "title": "System Monitor",
+  "description": "Memory, processor, disk or network, on a scale you can read a value off",
+  "author": "Kevin Chen",
+  "license": "MIT",
+  "version": "1.0.0",
+  "entry": "index.tsx",
+  "tags": [
+    "system"
+  ],
+  "minimumGailanVersion": "1.0.0",
+  "screenshotOutput": "ram 42",
+  "settings": [
+    {
+      "key": "source",
+      "type": "choice",
+      "label": "Reading",
+      "help": "What the panel watches",
+      "default": "ram",
+      "options": [
+        {
+          "value": "ram",
+          "label": "RAM Usage"
+        },
+        {
+          "value": "cpu",
+          "label": "CPU Usage"
+        },
+        {
+          "value": "disk",
+          "label": "Disk Usage"
+        },
+        {
+          "value": "network",
+          "label": "Network Usage"
+        }
+      ]
+    },
+    {
+      "key": "draggable",
+      "type": "toggle",
+      "label": "Drag to move",
+      "help": "Hold and drag the widget to place it. Needs interaction turned on in Gailan.",
+      "default": false
+    }
+  ]
+}
