@@ -33,7 +33,7 @@
       "key": "hours",
       "type": "choice",
       "label": "Hours",
-      "help": "A twelve hour clock with am and pm, or a twenty-four hour one",
+      "help": "The dial shows hands rather than numerals, so this applies to the digital face.",
       "default": "12",
       "options": [
         {
@@ -44,7 +44,10 @@
           "value": "24",
           "label": "24 hour"
         }
-      ]
+      ],
+      "enabledWhen": {
+        "face": "digital"
+      }
     },
     {
       "key": "background",
