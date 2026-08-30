@@ -173,6 +173,16 @@
           ]
         },
         {
+          "key": "opacity",
+          "type": "number",
+          "label": "Fill opacity",
+          "help": "How solid the panel is. The rest shows whatever is behind it.",
+          "default": 82,
+          "min": 10,
+          "max": 100,
+          "step": 1
+        },
+        {
           "key": "draggable",
           "type": "toggle",
           "label": "Drag to move",
@@ -187,7 +197,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 22274
+          "bytes": 22839
         },
         {
           "path": "preview.jpg",
@@ -199,7 +209,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 3738
+          "bytes": 3981
         }
       ]
     },
@@ -341,6 +351,16 @@
           ]
         },
         {
+          "key": "opacity",
+          "type": "number",
+          "label": "Fill opacity",
+          "help": "How solid the panel is. The rest shows whatever is behind it.",
+          "default": 82,
+          "min": 10,
+          "max": 100,
+          "step": 1
+        },
+        {
           "key": "draggable",
           "type": "toggle",
           "label": "Drag to move",
@@ -355,7 +375,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 28053
+          "bytes": 28519
         },
         {
           "path": "preview.jpg",
@@ -371,7 +391,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 3093
+          "bytes": 3336
         }
       ]
     },
@@ -571,6 +591,16 @@
           ]
         },
         {
+          "key": "opacity",
+          "type": "number",
+          "label": "Fill opacity",
+          "help": "How solid the panel is. The rest shows whatever is behind it.",
+          "default": 82,
+          "min": 10,
+          "max": 100,
+          "step": 1
+        },
+        {
           "key": "draggable",
           "type": "toggle",
           "label": "Drag to move",
@@ -585,7 +615,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 24384
+          "bytes": 24751
         },
         {
           "path": "preview.jpg",
@@ -597,7 +627,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 4253
+          "bytes": 4496
         }
       ]
     }

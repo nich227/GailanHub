@@ -193,6 +193,16 @@
       ]
     },
     {
+      "key": "opacity",
+      "type": "number",
+      "label": "Fill opacity",
+      "help": "How solid the panel is. The rest shows whatever is behind it.",
+      "default": 82,
+      "min": 10,
+      "max": 100,
+      "step": 1
+    },
+    {
       "key": "draggable",
       "type": "toggle",
       "label": "Drag to move",

@@ -193,16 +193,14 @@ const surfaceOf = (chosen?: string) =>
     : undefined;
 
 const Panel = styled("div")`
-  --surface: rgba(11, 11, 12, 0.82);
+  --surface: rgba(11, 11, 12, var(--fill, 0.82));
   --ink: #f4f4f2;
   --dim: rgba(244, 244, 242, 0.42);
   --rule: rgba(244, 244, 242, 0.16);
-  /* The accent is a setting. Left alone it is the colour macOS is set to use, which
-     WebKit hands over as AccentColor, so the panel agrees with the rest of the system
-     without being told. The red before it is what shows where that is not understood,
-     and a name chosen in settings arrives as a property and wins over both. */
-  --accent: #d71921;
-  --accent: AccentColor;
+  /* The accent is a setting. Left alone it is the colour macOS is set to, which Gailan
+     puts on the document; the red covers anywhere that has not been set. A name chosen in
+     settings arrives as a property and wins over both. */
+  --accent: var(--gailan-system-accent, #d71921);
 
   @media (prefers-color-scheme: light) {
     --ink: #0b0b0c;
@@ -216,61 +214,61 @@ const Panel = styled("div")`
      the near-white, and the ink is a very dark version of that same hue, so the
      two belong to each other rather than one being dropped on the other. */
   &[data-background="dark"] {
-    --surface: rgba(11, 11, 12, 0.82);
+    --surface: rgba(11, 11, 12, var(--fill, 0.82));
     --ink: #f4f4f2;
     --dim: rgba(244, 244, 242, 0.42);
     --rule: rgba(244, 244, 242, 0.16);
   }
 
   &[data-background="light"] {
-    --surface: rgba(244, 244, 242, 0.9);
+    --surface: rgba(244, 244, 242, var(--fill, 0.9));
     --ink: #0b0b0c;
     --dim: rgba(11, 11, 12, 0.45);
     --rule: rgba(11, 11, 12, 0.18);
   }
 
   &[data-background="red"] {
-    --surface: rgba(255, 226, 226, 0.92);
+    --surface: rgba(255, 226, 226, var(--fill, 0.92));
     --ink: #460809;
   }
 
   &[data-background="orange"] {
-    --surface: rgba(255, 237, 212, 0.92);
+    --surface: rgba(255, 237, 212, var(--fill, 0.92));
     --ink: #441306;
   }
 
   &[data-background="yellow"] {
-    --surface: rgba(254, 249, 194, 0.92);
+    --surface: rgba(254, 249, 194, var(--fill, 0.92));
     --ink: #432004;
   }
 
   &[data-background="green"] {
-    --surface: rgba(220, 252, 231, 0.92);
+    --surface: rgba(220, 252, 231, var(--fill, 0.92));
     --ink: #032e15;
   }
 
   &[data-background="teal"] {
-    --surface: rgba(203, 251, 241, 0.92);
+    --surface: rgba(203, 251, 241, var(--fill, 0.92));
     --ink: #022f2e;
   }
 
   &[data-background="blue"] {
-    --surface: rgba(219, 234, 254, 0.92);
+    --surface: rgba(219, 234, 254, var(--fill, 0.92));
     --ink: #162456;
   }
 
   &[data-background="indigo"] {
-    --surface: rgba(224, 231, 255, 0.92);
+    --surface: rgba(224, 231, 255, var(--fill, 0.92));
     --ink: #1e1a4d;
   }
 
   &[data-background="violet"] {
-    --surface: rgba(237, 233, 254, 0.92);
+    --surface: rgba(237, 233, 254, var(--fill, 0.92));
     --ink: #2f0d68;
   }
 
   &[data-background="pink"] {
-    --surface: rgba(255, 214, 230, 0.92);
+    --surface: rgba(255, 214, 230, var(--fill, 0.92));
     --ink: #1f1013;
   }
 
@@ -315,7 +313,7 @@ const Panel = styled("div")`
   font-family: "SF Mono", ui-monospace, Menlo, monospace;
 
   @media (prefers-color-scheme: light) {
-    --surface: rgba(244, 244, 242, 0.9);
+    --surface: rgba(244, 244, 242, var(--fill, 0.9));
   }
 `;
 
@@ -480,7 +478,7 @@ const startDrag = (event: any) => {
   document.addEventListener("mouseup", onUp);
 };
 
-type Settings = { draggable?: boolean; source?: Source; interval?: string | number; background?: string; accent?: string; };
+type Settings = { draggable?: boolean; source?: Source; interval?: string | number; background?: string; accent?: string; opacity?: number };
 type State = { output: string; error?: string; settings?: Settings };
 
 /* Bytes per second into something two or three figures wide, because the panel has room
@@ -502,6 +500,9 @@ export const render = (
   const draggable = settings?.draggable === true;
   const surface = surfaceOf(settings?.background);
   const accent = accentOf(settings?.accent);
+  /* how solid the panel is, as a fraction */
+  const fill = Number(settings?.opacity);
+  const solidity = Number.isFinite(fill) ? Math.min(Math.max(fill, 10), 100) / 100 : null;
   const source: Source = READINGS[settings?.source as Source]
     ? (settings?.source as Source)
     : "ram";
@@ -530,7 +531,10 @@ export const render = (
       data-gailan-desktop-glass=""
       data-draggable={draggable}
       data-background={surface}
-      style={accent ? { ["--accent" as string]: accent } : undefined}
+      style={{
+        ...(accent ? { ["--accent" as string]: accent } : {}),
+        ...(solidity !== null ? { ["--fill" as string]: String(solidity) } : {}),
+      }}
       ref={place}
       onMouseDown={draggable ? startDrag : undefined}
     >
