@@ -381,8 +381,6 @@ const Percent = styled("div")`
      and they have room to breathe */
   letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
-  /* the figure is the reading, so it carries the accent the same as the gauge does */
-  color: var(--accent);
 `;
 
 const Unit = styled("div")`
