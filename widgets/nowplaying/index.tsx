@@ -18,7 +18,7 @@ import { constrainDrag, React, run, styled } from "gailan";
 /* Spotify first, then Music, and nothing at all if neither has a track loaded. The
    player's state comes along so a paused track still shows, without its lamp beating.
    Each -e is a line of AppleScript, which keeps this to one command. */
-export const command = [
+const READING = [
   "osascript",
   '-e \'set a to ""\'',
   "-e 'tell application \"System Events\" to set p to name of processes'",
@@ -43,6 +43,8 @@ export const command = [
     ' & "|" & (duration of current track as string) & "|" & ""\'',
   "-e 'return a'",
 ].join(" ");
+
+export const command = READING;
 
 /* A track lasts minutes, and asking a player what it is playing is not free. */
 export const refreshFrequency = 5000;
@@ -407,19 +409,36 @@ const clock = (seconds: number) => {
 };
 
 
-/* Whichever player is there, told to do one thing. The same two-step as the reading
-   command: Spotify if it is running, Music otherwise. */
-function control(action: string) {
+/* Whichever player is there, told to do one thing. "is running" answers without
+   launching anything and without asking System Events for a list of processes, which is
+   the slow part of talking to another application. */
+function control(
+  action: string,
+  dispatch: (event: { output?: string; error?: string }) => void,
+  output: string
+) {
   const command = [
     "osascript",
-    "-e 'tell application \"System Events\" to set p to name of processes'",
-    `-e 'if p contains "Spotify" then tell application "Spotify" to ${action}'`,
-    `-e 'if p contains "Music" and not (p contains "Spotify") then` +
-      ` tell application "Music" to ${action}'`,
+    `-e 'if application "Spotify" is running then` +
+      ` tell application "Spotify" to ${action}'`,
+    `-e 'if application "Music" is running and not (application "Spotify" is running)` +
+      ` then tell application "Music" to ${action}'`,
   ].join(" ");
 
-  // nothing to do with the answer: the next read shows what happened
-  run(command).catch(() => {});
+  /* Play and pause is a state the panel already knows, so it is shown straight away and
+     the reading that follows confirms it. */
+  if (action === "playpause") {
+    const parts = output.split("|");
+    if (parts.length > 3 && (parts[3] === "playing" || parts[3] === "paused")) {
+      parts[3] = parts[3] === "playing" ? "paused" : "playing";
+      dispatch({ output: parts.join("|") });
+    }
+  }
+
+  run(command)
+    .then(() => run(READING))
+    .then((fresh: string) => dispatch({ output: String(fresh).trim() }))
+    .catch(() => {});
 }
 
 /* ---------- the controls ---------- */
@@ -513,27 +532,35 @@ const Pause = () => (
   </Glyph>
 );
 
-function Transport({ playing }: { playing: boolean }) {
+function Transport({
+  playing,
+  dispatch,
+  output,
+}: {
+  playing: boolean;
+  dispatch: (event: { output?: string; error?: string }) => void;
+  output: string;
+}) {
   return (
     <Controls>
       <Button
         type="button"
         aria-label="Previous track"
-        onClick={() => control("previous track")}
+        onClick={() => control("previous track", dispatch, output)}
       >
         <Previous />
       </Button>
       <Button
         type="button"
         aria-label={playing ? "Pause" : "Play"}
-        onClick={() => control("playpause")}
+        onClick={() => control("playpause", dispatch, output)}
       >
         {playing ? <Pause /> : <Play />}
       </Button>
       <Button
         type="button"
         aria-label="Next track"
-        onClick={() => control("next track")}
+        onClick={() => control("next track", dispatch, output)}
       >
         <Next />
       </Button>
@@ -620,7 +647,10 @@ const Beat = () => (
 type Settings = { draggable?: boolean; background?: string; accent?: string; opacity?: number };
 type State = { output: string; error?: string; settings?: Settings };
 
-export const render = ({ output, error, settings }: State) => {
+export const render = (
+  { output, error, settings }: State,
+  dispatch: (event: { output?: string; error?: string }) => void
+) => {
   const draggable = settings?.draggable === true;
   const surface = surfaceOf(settings?.background);
   const accent = accentOf(settings?.accent);
@@ -738,7 +768,7 @@ export const render = ({ output, error, settings }: State) => {
         </>
       ) : null}
 
-      <Transport playing={playing} />
+      <Transport playing={playing} dispatch={dispatch} output={output} />
     </Panel>
   );
 };
