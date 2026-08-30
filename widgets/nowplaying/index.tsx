@@ -18,13 +18,31 @@ import { constrainDrag, React, run, styled } from "gailan";
 /* Spotify first, then Music, and nothing at all if neither has a track loaded. The
    player's state comes along so a paused track still shows, without its lamp beating.
    Each -e is a line of AppleScript, which keeps this to one command. */
+/* Every player that answers the vocabulary iTunes established: a current track with a
+   name, an artist and an album, a player state and a position. Asked in turn, and the
+   first one playing something wins. Spotify is asked first because it also publishes a
+   url and artwork, which the others do not.
+
+   A player with its own vocabulary, VLC among them, is asked separately afterwards.
+   Anything playing in a browser tab cannot be asked at all: there is no scripting
+   interface for it, and the only way macOS exposes it is a private framework. */
+const ITUNES_STYLE = ["Spotify", "Music", "Swinsian", "Vox", "Doppler", "Plexamp"];
+
+const askPlayer = (app: string) =>
+  `-e 'if a is "" and application "${app}" is running then` +
+  `  tell application "${app}" to` +
+  `  if player state is not stopped then set a to (name of current track)` +
+  ` & "|" & (artist of current track) & "|" & (album of current track)` +
+  ` & "|" & (player state as string) & "|" & ""` +
+  ` & "|" & (player position as string)` +
+  ` & "|" & (duration of current track as string) & "|" & ""'`;
+
 const READING = [
   "osascript",
   '-e \'set a to ""\'',
-  /* Duration is divided here because the two players do not agree on units: Spotify
-     counts a track in milliseconds and Music in seconds. Both hand over seconds. The url
-     comes along because an episode says so in its url, which is how a podcast is told from
-     a song. */
+  /* Spotify counts a track in milliseconds where the rest count seconds, so its duration
+     is divided here and everything downstream is given seconds. Its url comes along
+     because an episode says so in its url, which is how a podcast is told from a song. */
   "-e 'if application \"Spotify\" is running then tell application \"Spotify\" to" +
     " if player state is not stopped then set a to (name of current track)" +
     ' & "|" & (artist of current track) & "|" & (album of current track)' +
@@ -32,16 +50,34 @@ const READING = [
     ' & "|" & (player position as string)' +
     ' & "|" & (((duration of current track) / 1000) as string)' +
     ' & "|" & (spotify url of current track)\'',
-  // Music holds artwork as data rather than at a url, so the cover is left empty there
-  "-e 'if a is \"\" and application \"Music\" is running then tell application \"Music\" to" +
-    " if player state is not stopped then set a to (name of current track)" +
-    ' & "|" & (artist of current track) & "|" & (album of current track)' +
-    ' & "|" & (player state as string) & "|" & "" & "|" & (player position as string)' +
-    ' & "|" & (duration of current track as string) & "|" & ""\'',
+  ...ITUNES_STYLE.filter((app) => app !== "Spotify").map(askPlayer),
+  /* VLC names things differently and reports position as a fraction of the whole */
+  "-e 'if a is \"\" and application \"VLC\" is running then tell application \"VLC\" to" +
+    ' if playing then set a to (name of current item) & "|" & "" & "|" & ""' +
+    ' & "|" & "playing" & "|" & "" & "|" & ((current time) as string)' +
+    ' & "|" & ((duration of current item) as string) & "|" & ""\'',
   "-e 'return a'",
 ].join(" ");
 
 export const command = READING;
+
+/* A reading costs a round trip to another application, so it is taken every couple of
+   seconds. The times and the bar move in between on this, which costs nothing. */
+export const init = (dispatch: (event: { tick: number }) => void) => {
+  setInterval(() => dispatch({ tick: Date.now() }), 500);
+};
+
+type Event = { tick?: number; output?: string; error?: string };
+type Playing = { output: string; error?: string; tick?: number };
+
+export const initialState: Playing = { output: "" };
+
+export const updateState = (event: Event, previous: Playing): Playing => {
+  /* a tick carries no reading; it is there to redraw what is already known */
+  if (event.tick) return { ...previous, tick: event.tick };
+
+  return { output: event.output || "", error: event.error };
+};
 
 /* Often enough that a change of track shows up without waiting. */
 export const refreshFrequency = 2000;
@@ -239,7 +275,6 @@ const Marks = styled("div")`
   justify-content: space-between;
   padding-bottom: 10px;
   margin-bottom: 12px;
-  border-bottom: 1px solid var(--rule);
 `;
 
 const Mark = styled("div")`
@@ -416,10 +451,16 @@ function control(
 ) {
   const command = [
     "osascript",
-    `-e 'if application "Spotify" is running then` +
-      ` tell application "Spotify" to ${action}'`,
-    `-e 'if application "Music" is running and not (application "Spotify" is running)` +
-      ` then tell application "Music" to ${action}'`,
+    '-e \'set done to false\'',
+    ...ITUNES_STYLE.map(
+      (app) =>
+        `-e 'if not done and application "${app}" is running then` +
+        `  tell application "${app}" to if player state is not stopped then` +
+        `  ${action}'` +
+        ` -e 'if not done and application "${app}" is running then` +
+        `  tell application "${app}" to if player state is not stopped then` +
+        `  set done to true'`
+    ),
   ].join(" ");
 
   /* Play and pause is a state the panel already knows, so it is shown straight away and
@@ -460,7 +501,6 @@ const Controls = styled("div")`
   gap: 18px;
   margin-top: 12px;
   padding-top: 11px;
-  border-top: 1px solid var(--rule);
 `;
 
 const Button = styled("button")`
