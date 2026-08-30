@@ -338,12 +338,19 @@ const Dial = styled("svg")`
      The rotation is CSS rather than arithmetic because the widget only hears from
      the machine once a second, which is a tick however smoothly it is drawn. */
   .hand-second {
-    stroke: var(--accent);
-    stroke-width: 1;
-    stroke-linecap: round;
     transform-box: view-box;
     transform-origin: 50px 50px;
     animation: gailan-clock-sweep 60s linear infinite;
+  }
+
+  .hand-second line {
+    stroke: var(--accent);
+    stroke-width: 1.4;
+    stroke-linecap: butt;
+  }
+
+  .hand-second circle {
+    fill: var(--accent);
   }
 
   /* asked for less movement: the hand steps once a second, from the transform the
@@ -403,11 +410,18 @@ function pointAt(angle: number, length: number) {
 /* Starts the sweep where the minute already is, and only once: setting the delay on
    every render would restart the animation each second, which is the stutter this is
    here to avoid. */
-const startSweep = (el: SVGLineElement | null) => {
-  if (!el || el.dataset.sweeping === "yes") return;
-  el.dataset.sweeping = "yes";
+const startSweep = (el: SVGGElement | null) => {
+  if (!el) return;
 
+  /* Locked to the wall clock once a minute rather than once ever. A 60s animation and the
+     machine's own clock drift apart over hours, and the impulse is what a station clock is
+     synchronized by. Re-locking lands while the hand is parked at twelve, where moving the
+     timeline shows nothing. */
   const at = new Date();
+  const minute = `${at.getHours()}:${at.getMinutes()}`;
+  if (el.dataset.lockedTo === minute) return;
+  el.dataset.lockedTo = minute;
+
   const into = at.getSeconds() + at.getMilliseconds() / 1000;
   el.style.animationDelay = `-${into.toFixed(3)}s`;
 };
@@ -423,7 +437,9 @@ function Hands({
 }) {
   // the hour hand moves through the hour rather than jumping at the top of it
   const hour = pointAt(((hours % 12) + minutes / 60) * 30, 24);
-  const minute = pointAt((minutes + seconds / 60) * 6, 34);
+  /* Hilfiker's minute hand does not creep: the master impulse advances it one click at
+     the top of the minute, which is why a row of station clocks agrees to the click. */
+  const minute = pointAt(minutes * 6, 34);
   // straight up, and turned by the animation. The inline rotation is what shows when
   // movement is turned off, since an animation outranks it while it is running.
   const second = pointAt(0, 38);
@@ -444,15 +460,17 @@ function Hands({
         x2={minute.x}
         y2={minute.y}
       />
-      <line
+      {/* The hand and its disc turn as one thing, so the group carries the rotation
+          and the parts are drawn where they sit at twelve o'clock. */}
+      <g
         className="hand-second"
         ref={startSweep}
         style={{transform: `rotate(${seconds * 6}deg)`}}
-        x1={CENTER}
-        y1={CENTER}
-        x2={second.x}
-        y2={second.y}
-      />
+      >
+        <line x1={CENTER} y1={CENTER} x2={second.x} y2={second.y} />
+        {/* the lollipop, as much a part of the design as the timing */}
+        <circle cx={CENTER} cy={CENTER - 29} r={4.6} />
+      </g>
       <circle className="cap" cx={CENTER} cy={CENTER} r={2.5} />
     </>
   );

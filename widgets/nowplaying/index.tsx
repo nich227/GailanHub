@@ -360,10 +360,6 @@ const Face = () => (
       font-display: block;
     }
 
-    @keyframes gailan-nowplaying-progress {
-      from { width: 0%; }
-      to { width: 100%; }
-    }
   `}</style>
 );
 
@@ -409,9 +405,10 @@ const Played = styled("div")`
   left: 0;
   width: 0;
   background: var(--accent);
-  animation-name: gailan-nowplaying-progress;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
+  /* Carried between readings rather than animated to the end of the track. A CSS
+     animation only restarts when its name changes or the element is replaced, so
+     changing its duration for a new song left the bar running the old one. */
+  transition: width 0.5s linear;
 `;
 
 const Times = styled("div")`
@@ -679,6 +676,10 @@ type State = { output: string; error?: string; settings?: Settings };
 /* the last reading, and when it arrived */
 let lastOutput = "";
 let arrivedAt = 0;
+/* Where the bar was last drawn, so a reading that moves it somewhere unreachable can be
+   told from one that carries on from where it was. */
+let shown = 0;
+let shownTotal = 0;
 
 export const render = (
   { output, error, settings }: State,
@@ -742,6 +743,13 @@ export const render = (
   const since = playing ? (Date.now() - arrivedAt) / 1000 : 0;
   const position = measured ? Math.min(reported + since, total) : reported;
 
+  /* Whether the bar is somewhere it could have reached by playing. Half a second of tick
+     plus a little slack; anything further is a different place in a track, or a different
+     track. */
+  const jumped = !measured || Math.abs(position - shown) > 1.5 || total !== shownTotal;
+  shown = measured ? position : 0;
+  shownTotal = total;
+
   /* Nothing loaded in either player, so nothing is drawn: no panel, no glass claimed
      behind it, and nothing for the arranging to move around. A widget that has nothing
      to say is better off saying it by being absent than by sitting there reading
@@ -795,10 +803,10 @@ export const render = (
           >
             <Played
               style={{
-                animationDuration: `${total}s`,
-                /* how much has already played */
-                animationDelay: `-${Math.min(position, total)}s`,
-                animationPlayState: playing ? "running" : "paused",
+                width: `${(position / total) * 100}%`,
+                /* A new song, or somebody scrubbing, moves the bar somewhere it cannot
+                   have travelled to, so it goes there rather than sliding. */
+                transition: jumped ? "none" : undefined,
               }}
             />
           </Progress>
