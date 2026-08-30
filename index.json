@@ -37,7 +37,7 @@
           "key": "hours",
           "type": "choice",
           "label": "Hours",
-          "help": "A twelve hour clock with am and pm, or a twenty-four hour one",
+          "help": "The dial shows hands rather than numerals, so this applies to the digital face.",
           "default": "12",
           "options": [
             {
@@ -48,7 +48,10 @@
               "value": "24",
               "label": "24 hour"
             }
-          ]
+          ],
+          "enabledWhen": {
+            "face": "digital"
+          }
         },
         {
           "key": "background",
@@ -104,6 +107,14 @@
             {
               "value": "pink",
               "label": "Pink"
+            },
+            {
+              "value": "gray",
+              "label": "Gray"
+            },
+            {
+              "value": "brown",
+              "label": "Brown"
             }
           ]
         },
@@ -197,7 +208,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 22839
+          "bytes": 23063
         },
         {
           "path": "preview.jpg",
@@ -209,7 +220,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 3981
+          "bytes": 4207
         }
       ]
     },
@@ -282,6 +293,14 @@
             {
               "value": "pink",
               "label": "Pink"
+            },
+            {
+              "value": "gray",
+              "label": "Gray"
+            },
+            {
+              "value": "brown",
+              "label": "Brown"
             }
           ]
         },
@@ -375,7 +394,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 30322
+          "bytes": 30623
         },
         {
           "path": "preview.jpg",
@@ -391,7 +410,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 3336
+          "bytes": 3486
         }
       ]
     },
@@ -522,6 +541,14 @@
             {
               "value": "pink",
               "label": "Pink"
+            },
+            {
+              "value": "gray",
+              "label": "Gray"
+            },
+            {
+              "value": "brown",
+              "label": "Brown"
             }
           ]
         },
@@ -615,7 +642,7 @@
         },
         {
           "path": "index.tsx",
-          "bytes": 24751
+          "bytes": 25089
         },
         {
           "path": "preview.jpg",
@@ -627,7 +654,7 @@
         },
         {
           "path": "widget.json",
-          "bytes": 4496
+          "bytes": 4646
         }
       ]
     }

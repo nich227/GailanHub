@@ -157,6 +157,8 @@ const BACKGROUNDS = [
   "indigo",
   "violet",
   "pink",
+  "gray",
+  "brown",
 ];
 
 /* The style the panel should wear, and nothing at all when it should follow the system,
@@ -272,6 +274,16 @@ const Panel = styled("div")`
     --ink: #1f1013;
   }
 
+  &[data-background="gray"] {
+    --surface: rgba(245, 245, 245, var(--fill, 0.92));
+    --ink: #0f0f10;
+  }
+
+  &[data-background="brown"] {
+    --surface: rgba(240, 230, 217, var(--fill, 0.92));
+    --ink: #231710;
+  }
+
   /* Every wash takes its quieter tones from its own ink, so a hue is described
      once and the rest follows from it. */
   &[data-background="red"],
@@ -282,7 +294,9 @@ const Panel = styled("div")`
   &[data-background="blue"],
   &[data-background="indigo"],
   &[data-background="violet"],
-  &[data-background="pink"] {
+  &[data-background="pink"],
+  &[data-background="gray"],
+  &[data-background="brown"] {
     --dim: color-mix(in srgb, var(--ink) 55%, transparent);
     --rule: color-mix(in srgb, var(--ink) 18%, transparent);
   }
@@ -323,7 +337,6 @@ const Marks = styled("div")`
   justify-content: space-between;
   padding-bottom: 10px;
   margin-bottom: 12px;
-  border-bottom: 1px solid var(--rule);
 `;
 
 const Mark = styled("div")`
@@ -368,12 +381,14 @@ const Percent = styled("div")`
      and they have room to breathe */
   letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
+  /* the figure is the reading, so it carries the accent the same as the gauge does */
+  color: var(--accent);
 `;
 
 const Unit = styled("div")`
   font-size: 13px;
   letter-spacing: 0.08em;
-  color: var(--dim);
+  color: var(--accent);
 `;
 
 /* Twenty divisions rather than a smooth fill: a scale you can read a value off,
@@ -405,7 +420,6 @@ const Footer = styled("div")`
   gap: 12px;
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid var(--rule);
   font-size: 9px;
   letter-spacing: 0.2em;
   text-transform: uppercase;

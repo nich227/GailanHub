@@ -84,6 +84,8 @@ const BACKGROUNDS = [
   "indigo",
   "violet",
   "pink",
+  "gray",
+  "brown",
 ];
 
 /* The style the panel should wear, and nothing at all when it should follow the system,
@@ -208,6 +210,16 @@ const Panel = styled("div")`
     --ink: #1f1013;
   }
 
+  &[data-background="gray"] {
+    --surface: rgba(245, 245, 245, var(--fill, 0.92));
+    --ink: #0f0f10;
+  }
+
+  &[data-background="brown"] {
+    --surface: rgba(240, 230, 217, var(--fill, 0.92));
+    --ink: #231710;
+  }
+
   /* Every wash takes its quieter tones from its own ink, so a hue is described
      once and the rest follows from it. */
   &[data-background="red"],
@@ -218,7 +230,9 @@ const Panel = styled("div")`
   &[data-background="blue"],
   &[data-background="indigo"],
   &[data-background="violet"],
-  &[data-background="pink"] {
+  &[data-background="pink"],
+  &[data-background="gray"],
+  &[data-background="brown"] {
     --dim: color-mix(in srgb, var(--ink) 55%, transparent);
     --rule: color-mix(in srgb, var(--ink) 18%, transparent);
   }
