@@ -349,10 +349,6 @@ const Dial = styled("svg")`
     stroke-linecap: butt;
   }
 
-  .hand-second circle {
-    fill: var(--accent);
-  }
-
   /* asked for less movement: the hand steps once a second, from the transform the
      render puts on it, which the animation was overriding */
   @media (prefers-reduced-motion: reduce) {
@@ -460,16 +456,14 @@ function Hands({
         x2={minute.x}
         y2={minute.y}
       />
-      {/* The hand and its disc turn as one thing, so the group carries the rotation
-          and the parts are drawn where they sit at twelve o'clock. */}
+      {/* The group takes the rotation and the hand is drawn where it stands at twelve
+          o'clock, so the turning is in one place. */}
       <g
         className="hand-second"
         ref={startSweep}
         style={{transform: `rotate(${seconds * 6}deg)`}}
       >
         <line x1={CENTER} y1={CENTER} x2={second.x} y2={second.y} />
-        {/* the lollipop, as much a part of the design as the timing */}
-        <circle cx={CENTER} cy={CENTER - 29} r={4.6} />
       </g>
       <circle className="cap" cx={CENTER} cy={CENTER} r={2.5} />
     </>
