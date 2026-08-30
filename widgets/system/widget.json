@@ -42,7 +42,7 @@
       "type": "list",
       "label": "Update every",
       "help": "How often the reading is taken. A processor reading costs a second of sampling, so it cannot go faster than that.",
-      "default": "5",
+      "default": "2",
       "options": [
         {
           "value": "1",
