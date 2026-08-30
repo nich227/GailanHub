@@ -389,12 +389,20 @@
       ],
       "files": [
         {
+          "path": "dotgothic16-OFL.txt",
+          "bytes": 4492
+        },
+        {
+          "path": "dotgothic16.ttf",
+          "bytes": 2069236
+        },
+        {
           "path": "dotmatrix-OFL.txt",
           "bytes": 4492
         },
         {
           "path": "index.tsx",
-          "bytes": 31249
+          "bytes": 26609
         },
         {
           "path": "preview.jpg",
