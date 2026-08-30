@@ -21,22 +21,19 @@ import { constrainDrag, React, run, styled } from "gailan";
 const READING = [
   "osascript",
   '-e \'set a to ""\'',
-  "-e 'tell application \"System Events\" to set p to name of processes'",
-  /* Duration is divided here rather than in the widget because the two players do not
-     agree on units: Spotify counts a track in milliseconds and Music counts it in
-     seconds. Both are handed over in seconds so nothing downstream has to know which
-     player answered. The url comes along because an episode says so in its url, which
-     is the only dependable way to tell a podcast from a song. */
-  "-e 'if p contains \"Spotify\" then tell application \"Spotify\" to" +
+  /* Duration is divided here because the two players do not agree on units: Spotify
+     counts a track in milliseconds and Music in seconds. Both hand over seconds. The url
+     comes along because an episode says so in its url, which is how a podcast is told from
+     a song. */
+  "-e 'if application \"Spotify\" is running then tell application \"Spotify\" to" +
     " if player state is not stopped then set a to (name of current track)" +
     ' & "|" & (artist of current track) & "|" & (album of current track)' +
     ' & "|" & (player state as string) & "|" & (artwork url of current track)' +
     ' & "|" & (player position as string)' +
     ' & "|" & (((duration of current track) / 1000) as string)' +
     ' & "|" & (spotify url of current track)\'',
-  // Music holds artwork as data rather than at a url, so there is nothing to point
-  // at and the cover is left empty there
-  "-e 'if a is \"\" and p contains \"Music\" then tell application \"Music\" to" +
+  // Music holds artwork as data rather than at a url, so the cover is left empty there
+  "-e 'if a is \"\" and application \"Music\" is running then tell application \"Music\" to" +
     " if player state is not stopped then set a to (name of current track)" +
     ' & "|" & (artist of current track) & "|" & (album of current track)' +
     ' & "|" & (player state as string) & "|" & "" & "|" & (player position as string)' +
@@ -46,8 +43,8 @@ const READING = [
 
 export const command = READING;
 
-/* A track lasts minutes, and asking a player what it is playing is not free. */
-export const refreshFrequency = 5000;
+/* Often enough that a change of track shows up without waiting. */
+export const refreshFrequency = 2000;
 
 export const className = `
   left: 24px;
@@ -647,6 +644,10 @@ const Beat = () => (
 type Settings = { draggable?: boolean; background?: string; accent?: string; opacity?: number };
 type State = { output: string; error?: string; settings?: Settings };
 
+/* the last reading, and when it arrived */
+let lastOutput = "";
+let arrivedAt = 0;
+
 export const render = (
   { output, error, settings }: State,
   dispatch: (event: { output?: string; error?: string }) => void
@@ -696,9 +697,18 @@ export const render = (
   const episode = (url || "").indexOf(":episode:") > -1;
   const by = (artist || "").trim() || (album || "").trim();
 
-  const position = Number(at);
+  const reported = Number(at);
   const total = Number(length);
-  const measured = Number.isFinite(position) && Number.isFinite(total) && total > 0;
+  const measured = Number.isFinite(reported) && Number.isFinite(total) && total > 0;
+
+  /* A reading takes a moment to fetch and another to be drawn, and the track keeps
+     playing throughout, so the time since it arrived is added back on. */
+  if (output !== lastOutput) {
+    lastOutput = output;
+    arrivedAt = Date.now();
+  }
+  const since = playing ? (Date.now() - arrivedAt) / 1000 : 0;
+  const position = measured ? Math.min(reported + since, total) : reported;
 
   /* Nothing loaded in either player, so nothing is drawn: no panel, no glass claimed
      behind it, and nothing for the arranging to move around. A widget that has nothing
